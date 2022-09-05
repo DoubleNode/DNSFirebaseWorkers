@@ -23,6 +23,7 @@ open class WKRFirebaseAnalytics: WKRBlankAnalytics {
         static public let placeCode = "place_code"
         static public let screenClass = AnalyticsParameterScreenClass
         static public let screenName = AnalyticsParameterScreenName
+        static public let searchTerm = "search_term"
         static public let signUpMethod = "sign_up_method"
         static public let timeOfDay = "time_of_day"
     }
