@@ -1,0 +1,239 @@
+{
+  "pins" : [
+    {
+      "identity" : "abseil-cpp-swiftpm",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/firebase/abseil-cpp-SwiftPM.git",
+      "state" : {
+        "revision" : "583de9bd60f66b40e78d08599cc92036c2e7e4e1",
+        "version" : "0.20220203.2"
+      }
+    },
+    {
+      "identity" : "alamofire",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Alamofire/Alamofire.git",
+      "state" : {
+        "revision" : "8dd85aee02e39dd280c75eef88ffdb86eed4b07b",
+        "version" : "5.6.2"
+      }
+    },
+    {
+      "identity" : "alamofireimage",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Alamofire/AlamofireImage.git",
+      "state" : {
+        "revision" : "98cbb00ce0ec5fc8e52a5b50a6bfc08d3e5aee10",
+        "version" : "4.2.0"
+      }
+    },
+    {
+      "identity" : "atomicswift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/DoubleNodeOpen/AtomicSwift.git",
+      "state" : {
+        "revision" : "58fbeed795715d9c8dd7bb7ae1c36f37f2827089",
+        "version" : "1.2.2"
+      }
+    },
+    {
+      "identity" : "boringssl-swiftpm",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/firebase/boringssl-SwiftPM.git",
+      "state" : {
+        "revision" : "dd3eda2b05a3f459fc3073695ad1b28659066eab",
+        "version" : "0.9.1"
+      }
+    },
+    {
+      "identity" : "dnsblanknetwork",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/DoubleNode/DNSBlankNetwork.git",
+      "state" : {
+        "revision" : "e4b441baf7761d5989213ddd1cbd31b00d5338a7",
+        "version" : "1.9.17"
+      }
+    },
+    {
+      "identity" : "dnsblankworkers",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/DoubleNode/DNSBlankWorkers.git",
+      "state" : {
+        "revision" : "ea93a61c8367b8afac1671fc20e5253787743d8c",
+        "version" : "1.9.60"
+      }
+    },
+    {
+      "identity" : "dnscore",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/DoubleNode/DNSCore.git",
+      "state" : {
+        "revision" : "c583a5e1cff8aa3f1e01ed0568fc414b9e4e3ee8",
+        "version" : "1.9.32"
+      }
+    },
+    {
+      "identity" : "dnscorethreading",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/DoubleNode/DNSCoreThreading.git",
+      "state" : {
+        "revision" : "24d5a62110fed06d627e979d1459f10c2b24643d",
+        "version" : "1.9.0"
+      }
+    },
+    {
+      "identity" : "dnscrashnetwork",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/DoubleNode/DNSCrashNetwork.git",
+      "state" : {
+        "revision" : "fc5860abe43d40f4bae1492b3719f5157ac167df",
+        "version" : "1.9.13"
+      }
+    },
+    {
+      "identity" : "dnsdataobjects",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/DoubleNode/DNSDataObjects.git",
+      "state" : {
+        "revision" : "b6de0346a5ded63f97535f3c3b6f19ddb60e64ce",
+        "version" : "1.9.36"
+      }
+    },
+    {
+      "identity" : "dnserror",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/DoubleNode/DNSError.git",
+      "state" : {
+        "revision" : "db7e75d714b953dd3081f834606118521b0c31c7",
+        "version" : "1.9.2"
+      }
+    },
+    {
+      "identity" : "dnsprotocols",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/DoubleNode/DNSProtocols.git",
+      "state" : {
+        "revision" : "16fac0b0b51e8da2e6a3caf8bf9a5656a6af8cf4",
+        "version" : "1.9.85"
+      }
+    },
+    {
+      "identity" : "firebase-ios-sdk",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/firebase/firebase-ios-sdk",
+      "state" : {
+        "revision" : "7f31a43f8c49bd4a1723bc9fecdfaa4411dd9f36",
+        "version" : "9.5.0"
+      }
+    },
+    {
+      "identity" : "gifu",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/kaishin/Gifu.git",
+      "state" : {
+        "revision" : "51f2eab32903e336f590c013267cfa4d7f8b06c4",
+        "version" : "3.3.1"
+      }
+    },
+    {
+      "identity" : "googleappmeasurement",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/google/GoogleAppMeasurement.git",
+      "state" : {
+        "revision" : "f54f60d0164d887e1174fa51ab2efe48a8e9d178",
+        "version" : "9.3.0"
+      }
+    },
+    {
+      "identity" : "googledatatransport",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/google/GoogleDataTransport.git",
+      "state" : {
+        "revision" : "5056b15c5acbb90cd214fe4d6138bdf5a740e5a8",
+        "version" : "9.2.0"
+      }
+    },
+    {
+      "identity" : "googleutilities",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/google/GoogleUtilities.git",
+      "state" : {
+        "revision" : "f4abe56ce62a779e64b525eb133c8fc2a84bbc1f",
+        "version" : "7.7.1"
+      }
+    },
+    {
+      "identity" : "grpc-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/grpc/grpc-ios.git",
+      "state" : {
+        "revision" : "8440b914756e0d26d4f4d054a1c1581daedfc5b6",
+        "version" : "1.44.3-grpc"
+      }
+    },
+    {
+      "identity" : "gtm-session-fetcher",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/google/gtm-session-fetcher.git",
+      "state" : {
+        "revision" : "19605024d59eaefdb1f6a2cb11ebe75df4421126",
+        "version" : "2.0.0"
+      }
+    },
+    {
+      "identity" : "leveldb",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/firebase/leveldb.git",
+      "state" : {
+        "revision" : "0706abcc6b0bd9cedfbb015ba840e4a780b5159b",
+        "version" : "1.22.2"
+      }
+    },
+    {
+      "identity" : "nanopb",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/firebase/nanopb.git",
+      "state" : {
+        "revision" : "819d0a2173aff699fb8c364b6fb906f7cdb1a692",
+        "version" : "2.30909.0"
+      }
+    },
+    {
+      "identity" : "promises",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/google/promises.git",
+      "state" : {
+        "revision" : "3e4e743631e86c8c70dbc6efdc7beaa6e90fd3bb",
+        "version" : "2.1.1"
+      }
+    },
+    {
+      "identity" : "sfsymbol",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Nirma/SFSymbol",
+      "state" : {
+        "revision" : "90ec3de89965be4612b496211e1f31a363a1df42",
+        "version" : "1.1.0"
+      }
+    },
+    {
+      "identity" : "swift-protobuf",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-protobuf.git",
+      "state" : {
+        "revision" : "b8230909dedc640294d7324d37f4c91ad3dcf177",
+        "version" : "1.20.1"
+      }
+    },
+    {
+      "identity" : "swiftybeaver",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SwiftyBeaver/SwiftyBeaver.git",
+      "state" : {
+        "revision" : "12b5acf96d98f91d50de447369bd18df74600f1a",
+        "version" : "1.9.6"
+      }
+    }
+  ],
+  "version" : 2
+}
