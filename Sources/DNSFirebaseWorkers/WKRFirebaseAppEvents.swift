@@ -22,7 +22,7 @@ open class WKRFirebaseAppEvents: WKRBlankAppEvents {
 
     open class func createAppEvent() -> DAOAppEvent { appEvent.init() }
     open class func createAppEvent(from object: DAOAppEvent) -> DAOAppEvent { appEvent.init(from: object) }
-    open class func createAppEvent(from data: DNSDataDictionary) -> DAOAppEvent { appEvent.init(from: data) }
+    open class func createAppEvent(from data: DNSDataDictionary) -> DAOAppEvent? { appEvent.init(from: data) }
 
     // MARK: - Properties -
     let db = Firestore.firestore()
@@ -50,7 +50,9 @@ open class WKRFirebaseAppEvents: WKRBlankAppEvents {
         guard let appEventData = document.data() else {
             return nil
         }
-        let appEvent = Self.createAppEvent(from: appEventData)
+        guard let appEvent = Self.createAppEvent(from: appEventData) else {
+            return nil
+        }
         appEvent.id = document.documentID
         return appEvent
     }

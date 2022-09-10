@@ -27,15 +27,15 @@ open class WKRFirebaseSystems: WKRBlankSystems {
 
     open class func createSystemEndPoint() -> DAOSystemEndPoint { systemEndPointType.init() }
     open class func createSystemEndPoint(from object: DAOSystemEndPoint) -> DAOSystemEndPoint { systemEndPointType.init(from: object) }
-    open class func createSystemEndPoint(from data: DNSDataDictionary) -> DAOSystemEndPoint { systemEndPointType.init(from: data) }
+    open class func createSystemEndPoint(from data: DNSDataDictionary) -> DAOSystemEndPoint? { systemEndPointType.init(from: data) }
 
     open class func createSystemState() -> DAOSystemState { systemStateType.init() }
     open class func createSystemState(from object: DAOSystemState) -> DAOSystemState { systemStateType.init(from: object) }
-    open class func createSystemState(from data: DNSDataDictionary) -> DAOSystemState { systemStateType.init(from: data) }
+    open class func createSystemState(from data: DNSDataDictionary) -> DAOSystemState? { systemStateType.init(from: data) }
 
     open class func createSystem() -> DAOSystem { systemType.init() }
     open class func createSystem(from object: DAOSystem) -> DAOSystem { systemType.init(from: object) }
-    open class func createSystem(from data: DNSDataDictionary) -> DAOSystem { systemType.init(from: data) }
+    open class func createSystem(from data: DNSDataDictionary) -> DAOSystem? { systemType.init(from: data) }
 
     // MARK: - Properties -
     let db = Firestore.firestore()
@@ -200,11 +200,12 @@ open class WKRFirebaseSystems: WKRBlankSystems {
         guard let systemData = document.data() else {
             return nil
         }
-
-        let system = Self.createSystem(from: systemData)
+        guard let system = Self.createSystem(from: systemData) else {
+            return nil
+        }
         system.id = document.documentID
         system.meta.updated = Self.xlt.time(from: systemData["updated"]) ?? system.meta.updated
-        system.currentState = Self.createSystemState(from: systemData)
+        system.currentState = Self.createSystemState(from: systemData)!
         system.currentState.meta.updated = system.meta.updated
         return system
     }
@@ -212,8 +213,9 @@ open class WKRFirebaseSystems: WKRBlankSystems {
         guard let endPointData = document.data() else {
             return nil
         }
-
-        let systemEndPoint = Self.createSystemEndPoint(from: endPointData)
+        guard let systemEndPoint = Self.createSystemEndPoint(from: endPointData) else {
+            return nil
+        }
         systemEndPoint.id = document.documentID
         systemEndPoint.meta.updated = Self.xlt.time(from: endPointData["updated"]) ?? systemEndPoint.meta.updated
         if systemEndPoint.name.asString.isEmpty {
@@ -238,8 +240,9 @@ open class WKRFirebaseSystems: WKRBlankSystems {
         guard let historyData = document.data() else {
             return nil
         }
-
-        let systemState = Self.createSystemState(from: historyData)
+        guard let systemState = Self.createSystemState(from: historyData) else {
+            return nil
+        }
         if let updated = Self.xlt.time(from: document.documentID) {
             systemState.meta.updated = updated
         } else {
