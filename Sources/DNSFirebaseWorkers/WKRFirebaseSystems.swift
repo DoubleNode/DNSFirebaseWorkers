@@ -17,6 +17,7 @@ import FirebaseFirestore
 
 // swiftlint:disable:next type_body_length
 open class WKRFirebaseSystems: WKRBlankSystems {
+    typealias API = WKRFirebaseSystemsAPI // swiftlint:disable:this type_name
     // MARK: - Class Factory methods -
     public static var systemEndPointType: DAOSystemEndPoint.Type = DAOSystemEndPoint.self
     public static var systemStateType: DAOSystemState.Type = DAOSystemState.self
@@ -41,35 +42,6 @@ open class WKRFirebaseSystems: WKRBlankSystems {
     let db = Firestore.firestore()
 
     // MARK: - Internal Work Methods
-    override open func intDoLoadSystem(for id: String,
-                                       with progress: DNSPTCLProgressBlock?,
-                                       and block: WKRPTCLSystemsBlkSystem?,
-                                       then resultBlock: DNSPTCLResultBlock?) {
-        guard !id.isEmpty else {
-            let error = DNSError.Systems.invalidParameters(parameters: ["id"], .firebaseWorkers(self))
-            block?(.failure(error))
-            _ = resultBlock?(.failure(error))
-            return
-        }
-        self.utilityLoadSystems(with: progress) { result in
-            if case .failure(let error) = result {
-                DNSCore.reportError(error)
-                block?(.failure(error))
-                _ = resultBlock?(.failure(error))
-                return
-            }
-            if case .success(let systems) = result {
-                guard let system = systems.first(where: { $0.id == id }) else {
-                    let error = DNSError.Systems.notFound(field: "id", value: id, .firebaseWorkers(self))
-                    block?(.failure(error))
-                    _ = resultBlock?(.failure(error))
-                    return
-                }
-                block?(.success(system))
-                _ = resultBlock?(.completed)
-            }
-        }
-    }
     override open func intDoLoadEndPoints(for system: DAOSystem,
                                           with progress: DNSPTCLProgressBlock?,
                                           and block: WKRPTCLSystemsBlkASystemEndPoint?,
@@ -172,6 +144,35 @@ open class WKRFirebaseSystems: WKRBlankSystems {
             }
         }
     }
+    override open func intDoLoadSystem(for id: String,
+                                       with progress: DNSPTCLProgressBlock?,
+                                       and block: WKRPTCLSystemsBlkSystem?,
+                                       then resultBlock: DNSPTCLResultBlock?) {
+        guard !id.isEmpty else {
+            let error = DNSError.Systems.invalidParameters(parameters: ["id"], .firebaseWorkers(self))
+            block?(.failure(error))
+            _ = resultBlock?(.failure(error))
+            return
+        }
+        self.utilityLoadSystems(with: progress) { result in
+            if case .failure(let error) = result {
+                DNSCore.reportError(error)
+                block?(.failure(error))
+                _ = resultBlock?(.failure(error))
+                return
+            }
+            if case .success(let systems) = result {
+                guard let system = systems.first(where: { $0.id == id }) else {
+                    let error = DNSError.Systems.notFound(field: "id", value: id, .firebaseWorkers(self))
+                    block?(.failure(error))
+                    _ = resultBlock?(.failure(error))
+                    return
+                }
+                block?(.success(system))
+                _ = resultBlock?(.completed)
+            }
+        }
+    }
     override open func intDoLoadSystems(with progress: DNSPTCLProgressBlock?,
                                         and block: WKRPTCLSystemsBlkASystem?,
                                         then resultBlock: DNSPTCLResultBlock?) {
@@ -193,6 +194,95 @@ open class WKRFirebaseSystems: WKRBlankSystems {
                 _ = resultBlock?(.completed)
             }
         }
+    }
+    override open func intDoOverride(system: DAOSystem,
+                                     with state: DNSSystemState,
+                                     with progress: DNSPTCLProgressBlock?,
+                                     and block: WKRPTCLSystemsBlkSystem?,
+                                     then resultBlock: DNSPTCLResultBlock?) {
+        let overrideState = state != .none ? state.rawValue.uppercased() : ""
+        guard !overrideState.isEmpty else {
+            let error = DNSError.Systems
+                .invalidParameters(parameters: ["overrideState"], .firebaseWorkers(self))
+            block?(.failure(error))
+            _ = resultBlock?(.error)
+            return
+        }
+        guard let dataRequest = try? API
+            .apiOverrideState(router: self.netRouter, systemId: system.id, state: overrideState)
+            .dataRequest.get() else {
+            let error = DNSError.NetworkBase.dataError(.firebaseWorkers(self))
+            block?(.failure(error))
+            _ = resultBlock?(.error)
+            return
+        }
+        self.processRequestJSON(.empty, dataRequest, with: resultBlock,
+                                onSuccess: { data in
+            let result = Self.xlt.dictionary(from: data)
+            guard let system = Self.createSystem(from: result) else {
+                let error = DNSError.NetworkBase.dataError(.firebaseWorkers(self))
+                block?(.failure(error))
+                _ = resultBlock?(.error)
+                return .failure(error)
+            }
+            block?(.success(system))
+            return .success
+        },
+                                onPendingError: { error, _ in
+            return DNSError.NetworkBase.lowerError(error: error, .firebaseWorkers(self))
+        },
+                                onError: { error, _ in
+            block?(.failure(error))
+        })
+    }
+    override open func intDoReport(result: WKRPTCLSystemsData.Result,
+                                   and failureCode: String,
+                                   and debugString: String,
+                                   for systemId: String,
+                                   and endPointId: String,
+                                   with progress: DNSPTCLProgressBlock?,
+                                   then resultBlock: DNSPTCLResultBlock?) -> WKRPTCLSystemsPubVoid {
+        let netRouter = self.netRouter
+        let future = WKRPTCLSystemsFutVoid { [weak self] promise in
+            guard !systemId.isEmpty else {
+                let error = DNSError.Systems
+                    .invalidParameters(parameters: ["systemId"], .firebaseWorkers(self as Any))
+                DNSCore.reportError(error)
+                promise(.failure(error))
+                _ = resultBlock?(.error)
+                return
+            }
+            guard !endPointId.isEmpty else {
+                let error = DNSError.Systems
+                    .invalidParameters(parameters: ["endPointId"], .firebaseWorkers(self as Any))
+                DNSCore.reportError(error)
+                promise(.failure(error))
+                _ = resultBlock?(.error)
+                return
+            }
+
+            let callData = WKRPTCLSystemsStateData(system: systemId,
+                                                   endPoint: endPointId,
+                                                   sendDebug: !debugString.isEmpty)
+            guard let dataRequest = try? API
+                .apiSystemsState(router: netRouter, callData: callData, result: result,
+                                 failureCode: failureCode, debugString: debugString)
+                .dataRequest.get() else {
+                let error = DNSError.NetworkBase.dataError(.firebaseWorkers(self as Any))
+                promise(.failure(error))
+                _ = resultBlock?(.error)
+                return
+            }
+            self?.processRequestData(.empty, dataRequest, with: resultBlock,
+                                     onSuccess: { _ in
+                promise(.success)
+                return .success
+            },
+                                     onError: { error, _ in
+                promise(.failure(error))
+            })
+        }
+        return future.eraseToAnyPublisher()
     }
 
     // MARK: - Utility methods -
