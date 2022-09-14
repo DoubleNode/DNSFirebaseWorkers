@@ -201,13 +201,6 @@ open class WKRFirebaseSystems: WKRBlankSystems {
                                      and block: WKRPTCLSystemsBlkSystem?,
                                      then resultBlock: DNSPTCLResultBlock?) {
         let overrideState = state != .none ? state.rawValue.uppercased() : ""
-        guard !overrideState.isEmpty else {
-            let error = DNSError.Systems
-                .invalidParameters(parameters: ["overrideState"], .firebaseWorkers(self))
-            block?(.failure(error))
-            _ = resultBlock?(.error)
-            return
-        }
         guard let dataRequest = try? API
             .apiOverrideState(router: self.netRouter, systemId: system.id, state: overrideState)
             .dataRequest.get() else {
