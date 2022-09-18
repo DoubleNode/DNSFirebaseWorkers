@@ -28,7 +28,7 @@ let package = Package(
         // Dependencies declare other packages that this package depends on.
         .package(url: "https://github.com/DoubleNodeOpen/AtomicSwift.git", from: "1.2.2"),
         .package(url: "https://github.com/DoubleNode/DNSBlankWorkers.git", from: "1.9.65"),
-        .package(url: "https://github.com/DoubleNode/DNSCore.git", from: "1.9.32"),
+        .package(url: "https://github.com/DoubleNode/DNSCore.git", from: "1.9.34"),
         .package(url: "https://github.com/DoubleNode/DNSCoreThreading.git", from: "1.9.0"),
         .package(url: "https://github.com/DoubleNode/DNSDataObjects.git", from: "1.9.41"),
         .package(url: "https://github.com/DoubleNode/DNSError.git", from: "1.9.2"),
@@ -45,6 +45,7 @@ let package = Package(
                 "DNSDataObjects", "DNSError", "DNSProtocols",
                 .product(name: "FirebaseAnalytics", package: "firebase-ios-sdk"),
                 .product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),
+                .product(name: "FirebaseRemoteConfig", package: "firebase-ios-sdk"),
             ]),
         .testTarget(
             name: "DNSFirebaseWorkersTests",
