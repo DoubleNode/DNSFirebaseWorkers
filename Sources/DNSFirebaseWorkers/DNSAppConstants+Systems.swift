@@ -27,6 +27,7 @@ public extension DNSAppConstants {
         static public let auth = "auth"
         static public let cart = "cart"
         static public let checkout = "checkout"
+        static public let users = "users"
 
         public enum Accounts {
             static public let codeBase = "Accounts"
@@ -118,6 +119,25 @@ public extension DNSAppConstants {
             public enum EndPoints {
                 static public let applyCoupon = "applyCoupon"
                 static public let checkout = "checkout"
+            }
+        }
+        public enum Users {
+            static public let codeBase = "Users"
+
+            static public let codeDebug = "SystemDebug\(codeBase)"
+            static public let codeStatus = "SystemStatus\(codeBase)"
+
+            static public var sendDebug: Bool { debug && (status != Status.normal) }
+
+            static public var status: String {
+                remoteConfig[codeStatus].stringValue ?? Status.normal
+            }
+            static public var debug: Bool {
+                remoteConfig[codeDebug].boolValue
+            }
+            public enum EndPoints {
+                static public let loadUser = "loadUser"
+                static public let updateUser = "updateUser"
             }
         }
     }
