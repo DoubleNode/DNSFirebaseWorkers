@@ -136,7 +136,9 @@ public extension DNSAppConstants {
                 remoteConfig[codeDebug].boolValue
             }
             public enum EndPoints {
+                static public let clearIdentity = "clearIdentity"
                 static public let loadUser = "loadUser"
+                static public let setIdentity = "setIdentity"
                 static public let updateUser = "updateUser"
             }
         }
