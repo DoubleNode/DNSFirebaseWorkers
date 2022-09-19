@@ -137,6 +137,7 @@ public extension DNSAppConstants {
             }
             public enum EndPoints {
                 static public let loadUser = "loadUser"
+                static public let setIdentity = "setIdentity"
                 static public let updateUser = "updateUser"
             }
         }
