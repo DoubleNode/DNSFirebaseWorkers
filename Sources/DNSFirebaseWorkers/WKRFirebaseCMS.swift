@@ -280,6 +280,7 @@ open class WKRFirebaseCMS: WKRBlankCms {
                 var results: [DAODocument] = documents
                     .compactMap { $0.data() }
                     .compactMap { Self.createDocument(from: $0) }
+                    .sorted { $0.priority > $1.priority }
                 block?(.success(results))
                 _ = resultBlock?(.completed)
             }
