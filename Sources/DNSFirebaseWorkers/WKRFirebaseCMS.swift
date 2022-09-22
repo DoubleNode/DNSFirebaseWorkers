@@ -9,13 +9,13 @@
 import DNSBlankWorkers
 import DNSCore
 import DNSCoreThreading
+import DNSDataObjects
 import DNSError
 import DNSProtocols
 import FirebaseFirestore
 
 open class WKRFirebaseCMS: WKRBlankCms {
     public enum Group {
-        public static let contactUsDetails = "contactUs"
         public static let faqs = "faqs"
         public static let legalDocuments = "legalDocuments"
         public static let stringsAboutUsDocuments = "strings/aboutUs"
@@ -25,11 +25,6 @@ open class WKRFirebaseCMS: WKRBlankCms {
         public static let aboutUs = "aboutUs"
     }
 
-    public enum ContactUs {
-        public static let body = "body"
-        public static let email = "email"
-        public static let subject = "subject"
-    }
     public enum FAQSections {
         public static let iconKey = "iconKey"
         public static let items = "items"
@@ -58,6 +53,27 @@ open class WKRFirebaseCMS: WKRBlankCms {
         public static let logoUrl = "logoUrl"
     }
 
+    // MARK: - Class Factory methods -
+    public static var documentType: DAODocument.Type = DAODocument.self
+    public static var faqType: DAOFaq.Type = DAOFaq.self
+    public static var faqSectionType: DAOFaqSection.Type = DAOFaqSection.self
+
+    open class var document: DAODocument.Type { documentType }
+    open class var faq: DAOFaq.Type { faqType }
+    open class var faqSection: DAOFaqSection.Type { faqSectionType }
+
+    open class func createDocument() -> DAODocument { document.init() }
+    open class func createDocument(from object: DAODocument) -> DAODocument { document.init(from: object) }
+    open class func createDocument(from data: DNSDataDictionary) -> DAODocument? { document.init(from: data) }
+
+    open class func createFaq() -> DAOFaq { faq.init() }
+    open class func createFaq(from object: DAOFaq) -> DAOFaq { faq.init(from: object) }
+    open class func createFaq(from data: DNSDataDictionary) -> DAOFaq? { faq.init(from: data) }
+
+    open class func createFaqSection() -> DAOFaqSection { faqSection.init() }
+    open class func createFaqSection(from object: DAOFaqSection) -> DAOFaqSection { faqSection.init(from: object) }
+    open class func createFaqSection(from data: DNSDataDictionary) -> DAOFaqSection? { faqSection.init(from: data) }
+
     let db = Firestore.firestore()
 
     // MARK: - Internal Work Methods
@@ -66,9 +82,6 @@ open class WKRFirebaseCMS: WKRBlankCms {
                                  and block: WKRPTCLCmsBlkAAny?,
                                  then resultBlock: DNSPTCLResultBlock?) {
         switch group {
-        case WKRFirebaseCMS.Group.contactUsDetails:
-            self.utilityLoadContactUsData(with: progress,
-                                          and: block, then: resultBlock)
         case WKRFirebaseCMS.Group.faqs:
             self.utilityLoadFAQsData(with: progress,
                                      and: block, then: resultBlock)
@@ -88,12 +101,15 @@ open class WKRFirebaseCMS: WKRBlankCms {
     }
 
     // Protocol Return Types
+    public typealias WKRFirebaseCMSRtnADocument = [DAODocument]
     public typealias WKRFirebaseCMSRtnDataDictionary = DNSDataDictionary
 
     // Protocol Result Types
+    public typealias WKRFirebaseCMSResADocument = Result<WKRFirebaseCMSRtnADocument, Error>
     public typealias WKRFirebaseCMSResDataDictionary = Result<WKRFirebaseCMSRtnDataDictionary, Error>
 
     // Protocol Block Types
+    public typealias WKRFirebaseCMSBlkADocument = (WKRFirebaseCMSResADocument) -> Void
     public typealias WKRFirebaseCMSBlkDataDictionary = (WKRFirebaseCMSResDataDictionary) -> Void
 
     // MARK: - Utility methods -
@@ -101,35 +117,12 @@ open class WKRFirebaseCMS: WKRBlankCms {
         return string.replacingOccurrences(of: "\\r", with: "\r")
             .replacingOccurrences(of: "\\n", with: "\n")
     }
-    func utilityLoadContactUsData(with progress: DNSPTCLProgressBlock?,
-                                  and block: WKRPTCLCmsBlkAAny?,
-                                  then resultBlock: DNSPTCLResultBlock?) {
-        self.utilityLoadData(from: WKRFirebaseCMS.Group.contactUsDetails,
-                             with: progress,
-                             and: { result in
-            if case .failure(let error) = result {
-                block?(.failure(error))
-                _ = resultBlock?(.error)
-                return
-            }
-            if case .success(let data) = result {
-                block?(.success([
-                    [
-                        ContactUs.body: data[ContactUs.body],
-                        ContactUs.email: data[ContactUs.email],
-                        ContactUs.subject: data[ContactUs.subject],
-                    ],
-                ]))
-                _ = resultBlock?(.completed)
-            }
-        })
-    }
     func utilityLoadData(from path: String,
                          _ page: String = DNSCore.languageCode,
                          with progress: DNSPTCLProgressBlock?,
                          and block: WKRFirebaseCMSBlkDataDictionary?) {
-        let contactUsRef = db.collection(path).document(page)
-        contactUsRef.getDocument { (document, error) in
+        let dataRef = db.collection(path).document(page)
+        dataRef.getDocument { (document, error) in
             DNSThread.run {
                 if let error {
                     let dnsError = DNSError.WorkerBase.systemError(error: error, .firebaseWorkers(self))
@@ -143,14 +136,14 @@ open class WKRFirebaseCMS: WKRBlankCms {
                     block?(.failure(dnsError))
                     return
                 }
-                guard let contactUsData = document.data() else {
+                guard let data = document.data() else {
                     let dnsError = DNSError.WorkerBase
                         .notFound(field: "page", value: page, .firebaseWorkers(self))
                     DNSCore.reportError(dnsError)
                     block?(.failure(dnsError))
                     return
                 }
-                block?(.success(contactUsData))
+                block?(.success(data))
             }
         }
     }
@@ -171,6 +164,7 @@ open class WKRFirebaseCMS: WKRBlankCms {
                     let dnsError = DNSError.WorkerBase.unknown(.firebaseWorkers(self))
                     DNSCore.reportError(dnsError)
                     block?(.failure(dnsError))
+                    _ = resultBlock?(.error)
                     return
                 }
                 let sectionData = data["sections"]! as [String: DNSDataDictionary]
@@ -189,16 +183,17 @@ open class WKRFirebaseCMS: WKRBlankCms {
                     retval.append(section)
                 }
                 block?(.success(retval))
+                _ = resultBlock?(.completed)
             }
         })
     }
     func utilityLoadDocumentLegalsData(with progress: DNSPTCLProgressBlock?,
                                        and block: WKRPTCLCmsBlkAAny?,
                                        then resultBlock: DNSPTCLResultBlock?) {
-        self.utilityLoadDocumentsData(for: WKRFirebaseCMS.Group.legalDocuments,
-                                      with: progress,
-                                      and: block,
-                                      then: resultBlock)
+        self.utilityLoadDocuments(from: WKRFirebaseCMS.Group.legalDocuments,
+                                  with: progress,
+                                  and: block,
+                                  then: resultBlock)
     }
     func utilityLoadDocumentStringsData(path: String,
                                         with progress: DNSPTCLProgressBlock?,
@@ -219,6 +214,7 @@ open class WKRFirebaseCMS: WKRBlankCms {
                     let error = DNSError.WorkerBase.unknown(.firebaseWorkers(self))
                     DNSCore.reportError(error)
                     block?(.failure(error))
+                    _ = resultBlock?(.error)
                     return
                 }
                 let sortedData = data
@@ -256,8 +252,38 @@ open class WKRFirebaseCMS: WKRBlankCms {
                     retval.append(document)
                 }
                 block?(.success(retval))
+                _ = resultBlock?(.completed)
             }
         })
+    }
+    func utilityLoadDocuments(from path: String,
+                              with progress: DNSPTCLProgressBlock?,
+                              and block: WKRPTCLCmsBlkAAny?,
+                              then resultBlock: DNSPTCLResultBlock?) {
+        let documentsRef = self.db.collection(path)
+        documentsRef.getDocuments { querySnapshot, error in
+            DNSThread.run {
+                if let error {
+                    let dnsError = DNSError.WorkerBase.systemError(error: error, .firebaseWorkers(self))
+                    DNSCore.reportError(dnsError)
+                    block?(.failure(dnsError))
+                    _ = resultBlock?(.error)
+                    return
+                }
+                guard let documents = querySnapshot?.documents else {
+                    let dnsError = DNSError.Systems.unknown(.firebaseWorkers(self))
+                    DNSCore.reportError(dnsError)
+                    block?(.failure(dnsError))
+                    _ = resultBlock?(.error)
+                    return
+                }
+                var results: [DAODocument] = documents
+                    .compactMap { $0.data() }
+                    .compactMap { Self.createDocument(from: $0) }
+                block?(.success(results))
+                _ = resultBlock?(.completed)
+            }
+        }
     }
     func utilityLoadDocumentsData(for group: String,
                                   with progress: DNSPTCLProgressBlock?,
@@ -277,6 +303,7 @@ open class WKRFirebaseCMS: WKRBlankCms {
                     let error = DNSError.WorkerBase.unknown(.firebaseWorkers(self))
                     DNSCore.reportError(error)
                     block?(.failure(error))
+                    _ = resultBlock?(.error)
                     return
                 }
                 let sortedData = data
@@ -294,6 +321,7 @@ open class WKRFirebaseCMS: WKRBlankCms {
                     retval.append(document)
                 }
                 block?(.success(retval))
+                _ = resultBlock?(.completed)
             }
         })
     }

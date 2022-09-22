@@ -30,7 +30,7 @@ let package = Package(
         .package(url: "https://github.com/DoubleNode/DNSBlankWorkers.git", from: "1.9.65"),
         .package(url: "https://github.com/DoubleNode/DNSCore.git", from: "1.9.34"),
         .package(url: "https://github.com/DoubleNode/DNSCoreThreading.git", from: "1.9.0"),
-        .package(url: "https://github.com/DoubleNode/DNSDataObjects.git", from: "1.9.41"),
+        .package(url: "https://github.com/DoubleNode/DNSDataObjects.git", from: "1.9.42"),
         .package(url: "https://github.com/DoubleNode/DNSError.git", from: "1.9.2"),
         .package(url: "https://github.com/DoubleNode/DNSProtocols.git", from: "1.9.91"),
         .package(url: "https://github.com/firebase/firebase-ios-sdk.git", from: "9.5.0"),
