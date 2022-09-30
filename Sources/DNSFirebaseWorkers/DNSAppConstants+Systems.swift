@@ -75,10 +75,11 @@ public extension DNSAppConstants {
                 remoteConfig[codeDebug].boolValue
             }
             public enum EndPoints {
-                static public let checkStatus = "checkStatus"
-                static public let signIn = "signIn"
-                static public let signOut = "signOut"
-                static public let signUp = "signUp"
+                static let checkAuth = "checkAuth"
+                static let linkAuth = "linkAuth"
+                static let signIn = "signIn"
+                static let signOut = "signOut"
+                static let signUp = "signUp"
             }
         }
         public enum Cart {
@@ -139,6 +140,7 @@ public extension DNSAppConstants {
                 static public let clearIdentity = "clearIdentity"
                 static public let loadUser = "loadUser"
                 static public let setIdentity = "setIdentity"
+                static public let removeUser = "removeUser"
                 static public let updateUser = "updateUser"
             }
         }
