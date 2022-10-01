@@ -50,7 +50,7 @@ public extension DNSAppConstants {
                 static public let deactivate = "deactivate"
                 static public let delete = "delete"
                 static public let denyChangeRequest = "denyChangeRequest"
-                static public let loadAccount = "loadAccount"
+                static public let loadAccounts = "loadAccounts"
                 static public let loadChangeRequests = "loadChangeRequests"
                 static public let loadTabs = "loadTabs"
                 static public let loadUser = "loadUser"
