@@ -17,6 +17,14 @@ import Foundation
 open class WKRFirebaseAccount: WKRBlankAccount {
     typealias API = WKRFirebaseAccountAPI // swiftlint:disable:this type_name
 
+    // MARK: - Class Factory methods -
+    public static var accountType: DAOAccount.Type = DAOAccount.self
+    open class var account: DAOAccount.Type { accountType }
+
+    open class func createAccount() -> DAOAccount { account.init() }
+    open class func createAccount(from object: DAOAccount) -> DAOAccount { account.init(from: object) }
+    open class func createAccount(from data: DNSDataDictionary) -> DAOAccount? { account.init(from: data) }
+
     // MARK: - Internal Work Methods
     override open func intDoActivate(account: DAOAccount,
                                      with progress: DNSPTCLProgressBlock?,
@@ -56,14 +64,6 @@ open class WKRFirebaseAccount: WKRBlankAccount {
                                        with progress: DNSPTCLProgressBlock?,
                                        and block: WKRPTCLAccountBlkVoid?,
                                        then resultBlock: DNSPTCLResultBlock?) {
-//        guard let account = account as? DAOAccount else {
-//            let dnsError = DNSError.WorkerBase
-//                .invalidParameters(parameters: ["account"], .firebaseWorkers(self))
-//            DNSCore.reportError(dnsError)
-//            block?(.failure(dnsError))
-//            _ = resultBlock?(.error)
-//            return
-//        }
         let callData = WKRPTCLSystemsStateData(system: DNSAppConstants.Systems.accounts,
                                                endPoint: DNSAppConstants.Systems.Accounts.EndPoints.deactivate,
                                                sendDebug: DNSAppConstants.Systems.Accounts.sendDebug)
@@ -90,14 +90,6 @@ open class WKRFirebaseAccount: WKRBlankAccount {
                                    with progress: DNSPTCLProgressBlock?,
                                    and block: WKRPTCLAccountBlkVoid?,
                                    then resultBlock: DNSPTCLResultBlock?) {
-//        guard let account = account as? DAOAccount else {
-//            let dnsError = DNSError.WorkerBase
-//                .invalidParameters(parameters: ["account"], .firebaseWorkers(self))
-//            DNSCore.reportError(dnsError)
-//            block?(.failure(dnsError))
-//            _ = resultBlock?(.error)
-//            return
-//        }
         let callData = WKRPTCLSystemsStateData(system: DNSAppConstants.Systems.accounts,
                                                endPoint: DNSAppConstants.Systems.Accounts.EndPoints.delete,
                                                sendDebug: DNSAppConstants.Systems.Accounts.sendDebug)
@@ -137,14 +129,10 @@ open class WKRFirebaseAccount: WKRBlankAccount {
         self.processRequestJSON(callData, dataRequest, with: resultBlock,
                                 onSuccess: { data in
             let result = Self.xlt.dictionary(from: data)
-            guard let account = DAOAccount(from: result) else {
-                let error = DNSError.Account.unknown(.firebaseWorkers(self))
-                return .failure(error)
-            }
-            account.id = user.id
-            account.name = user.email
-            account.users = [user]
-            block?(.success([account]))
+            let accountsData = Self.xlt.dataarray(from: result["accounts"] as Any?)
+            let accounts = accountsData
+                .compactMap { Self.createAccount(from: $0) }
+            block?(.success(accounts))
             return .success
         },
                                 onPendingError: { error, _ in
@@ -161,14 +149,6 @@ open class WKRFirebaseAccount: WKRBlankAccount {
                                    with progress: DNSPTCLProgressBlock?,
                                    and block: WKRPTCLAccountBlkVoid?,
                                    then resultBlock: DNSPTCLResultBlock?) {
-//        guard let account = account as? DAOAccount else {
-//            let dnsError = DNSError.WorkerBase
-//                .invalidParameters(parameters: ["account"], .firebaseWorkers(self))
-//            DNSCore.reportError(dnsError)
-//            block?(.failure(dnsError))
-//            _ = resultBlock?(.error)
-//            return
-//        }
         let callData = WKRPTCLSystemsStateData(system: DNSAppConstants.Systems.accounts,
                                                endPoint: DNSAppConstants.Systems.Accounts.EndPoints.updateAccount,
                                                sendDebug: DNSAppConstants.Systems.Accounts.sendDebug)
