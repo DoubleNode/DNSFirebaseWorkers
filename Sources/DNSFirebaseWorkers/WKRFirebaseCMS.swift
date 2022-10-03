@@ -277,7 +277,7 @@ open class WKRFirebaseCMS: WKRBlankCms {
                     _ = resultBlock?(.error)
                     return
                 }
-                var results: [DAODocument] = documents
+                let results: [DAODocument] = documents
                     .compactMap { $0.data() }
                     .compactMap { Self.createDocument(from: $0) }
                     .sorted { $0.priority > $1.priority }
