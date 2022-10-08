@@ -27,7 +27,7 @@ let package = Package(
     dependencies: [
         // Dependencies declare other packages that this package depends on.
         .package(url: "https://github.com/DoubleNodeOpen/AtomicSwift.git", from: "1.2.2"),
-        .package(url: "https://github.com/DoubleNode/DNSBlankWorkers.git", from: "1.9.74"),
+        .package(url: "https://github.com/DoubleNode/DNSBlankWorkers.git", from: "1.9.75"),
         .package(url: "https://github.com/DoubleNode/DNSCore.git", from: "1.9.44"),
         .package(url: "https://github.com/DoubleNode/DNSCoreThreading.git", from: "1.9.0"),
         .package(url: "https://github.com/DoubleNode/DNSCrashWorkers.git", from: "1.9.58"),

@@ -59,8 +59,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/DoubleNode/DNSBlankWorkers.git",
       "state" : {
-        "revision" : "d791401d98e5815fd2c398c9492db10ae94225db",
-        "version" : "1.9.74"
+        "revision" : "16183f9d8f880760f72a30e6974b72b39bd289e3",
+        "version" : "1.9.75"
       }
     },
     {

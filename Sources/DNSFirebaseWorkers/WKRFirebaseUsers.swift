@@ -5,6 +5,7 @@
 //  Created by Darren Ehlers on 9/10/22.
 //
 
+import Alamofire
 import DNSBlankWorkers
 import DNSCore
 import DNSCrashNetwork
@@ -102,15 +103,23 @@ open class WKRFirebaseUsers: WKRBlankUsers {
             block?(.failure(error)); _ = resultBlock?(.error)
             return
         }
-        self.processRequestJSON(callData, dataRequest, with: resultBlock,
+        self.processRequestData(callData, dataRequest, with: resultBlock,
                                 onSuccess: { data in
-            let result = Self.xlt.dictionary(from: data)
-            guard let user = Self.createUser(from: result) else {
-                let error = DNSError.Users.unknown(.firebaseWorkers(self))
+            do {
+                let user = try JSONDecoder().decode(Self.userType, from: data)
+                block?(.success(user))
+                return .success
+            } catch {
+                DNSCore.reportError(error)
                 return .failure(error)
             }
-            block?(.success(user))
-            return .success
+//            let result = Self.xlt.dictionary(from: data)
+//            guard let user = Self.createUser(from: result) else {
+//                let error = DNSError.Users.unknown(.firebaseWorkers(self))
+//                return .failure(error)
+//            }
+//            block?(.success(user))
+//            return .success
         },
                                 onPendingError: { error, _ in
             if case DNSError.NetworkBase.expiredAccessToken = error {
@@ -168,6 +177,11 @@ open class WKRFirebaseUsers: WKRBlankUsers {
                                    with progress: DNSPTCLProgressBlock?,
                                    and block: WKRPTCLUsersBlkVoid?,
                                    then resultBlock: DNSPTCLResultBlock?) {
+        user.name.namePrefix = "namePrefix"
+        user.name.middleName = "middleName"
+        user.name.nameSuffix = "nameSuffix"
+        user.name.nickname = "nickname"
+
         let callData = WKRPTCLSystemsStateData(system: DNSAppConstants.Systems.users,
                                                endPoint: DNSAppConstants.Systems.Users.EndPoints.updateUser,
                                                sendDebug: DNSAppConstants.Systems.Users.sendDebug)
