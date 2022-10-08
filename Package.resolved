@@ -104,8 +104,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/DoubleNode/DNSDataObjects.git",
       "state" : {
-        "revision" : "49babda308e11e43d7c5b774ec279c41e529e726",
-        "version" : "1.9.46"
+        "revision" : "05cb9b3e7e36a1064937e2d493499acd7d8bf5fd",
+        "version" : "1.9.47"
       }
     },
     {
@@ -122,8 +122,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/DoubleNode/DNSProtocols.git",
       "state" : {
-        "revision" : "f55d251ebf4a298577baef66b6829847035ba4d2",
-        "version" : "1.9.101"
+        "revision" : "261d0c3de17281f3826bf8b448014e20150940e0",
+        "version" : "1.9.102"
       }
     },
     {
@@ -187,6 +187,15 @@
       "state" : {
         "revision" : "19605024d59eaefdb1f6a2cb11ebe75df4421126",
         "version" : "2.0.0"
+      }
+    },
+    {
+      "identity" : "keyedcodable",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/dgrzeszczak/KeyedCodable.git",
+      "state" : {
+        "revision" : "7e24e26cf3a844ee0dbcdbcc8c78ed45f9570e69",
+        "version" : "3.1.2"
       }
     },
     {

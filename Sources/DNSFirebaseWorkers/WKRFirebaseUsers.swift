@@ -113,13 +113,6 @@ open class WKRFirebaseUsers: WKRBlankUsers {
                 DNSCore.reportError(error)
                 return .failure(error)
             }
-//            let result = Self.xlt.dictionary(from: data)
-//            guard let user = Self.createUser(from: result) else {
-//                let error = DNSError.Users.unknown(.firebaseWorkers(self))
-//                return .failure(error)
-//            }
-//            block?(.success(user))
-//            return .success
         },
                                 onPendingError: { error, _ in
             if case DNSError.NetworkBase.expiredAccessToken = error {

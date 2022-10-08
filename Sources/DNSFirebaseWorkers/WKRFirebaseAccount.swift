@@ -13,6 +13,7 @@ import DNSDataObjects
 import DNSError
 import DNSProtocols
 import Foundation
+import KeyedCodable
 
 open class WKRFirebaseAccount: WKRBlankAccount {
     typealias API = WKRFirebaseAccountAPI // swiftlint:disable:this type_name
@@ -126,14 +127,16 @@ open class WKRFirebaseAccount: WKRBlankAccount {
             block?(.failure(error)); _ = resultBlock?(.error)
             return
         }
-        self.processRequestJSON(callData, dataRequest, with: resultBlock,
+        self.processRequestData(callData, dataRequest, with: resultBlock,
                                 onSuccess: { data in
-            let result = Self.xlt.dictionary(from: data)
-            let accountsData = Self.xlt.dataarray(from: result["accounts"] as Any?)
-            let accounts = accountsData
-                .compactMap { Self.createAccount(from: $0) }
-            block?(.success(accounts))
-            return .success
+            do {
+                let accountsResponse = try AccountsResponse.keyed.fromJSON(data)
+                block?(.success(accountsResponse.accounts))
+                return .success
+            } catch {
+                DNSCore.reportError(error)
+                return .failure(error)
+            }
         },
                                 onPendingError: { error, _ in
             if case DNSError.NetworkBase.expiredAccessToken = error {

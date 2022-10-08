@@ -209,17 +209,16 @@ open class WKRFirebaseSystems: WKRBlankSystems {
             _ = resultBlock?(.error)
             return
         }
-        self.processRequestJSON(.empty, dataRequest, with: resultBlock,
+        self.processRequestData(.empty, dataRequest, with: resultBlock,
                                 onSuccess: { data in
-            let result = Self.xlt.dictionary(from: data)
-            guard let system = Self.createSystem(from: result) else {
-                let error = DNSError.NetworkBase.dataError(.firebaseWorkers(self))
-                block?(.failure(error))
-                _ = resultBlock?(.error)
+            do {
+                let system = try JSONDecoder().decode(Self.systemType, from: data)
+                block?(.success(system))
+                return .success
+            } catch {
+                DNSCore.reportError(error)
                 return .failure(error)
             }
-            block?(.success(system))
-            return .success
         },
                                 onPendingError: { error, _ in
             return DNSError.NetworkBase.lowerError(error: error, .firebaseWorkers(self))
@@ -237,9 +236,10 @@ open class WKRFirebaseSystems: WKRBlankSystems {
                                    then resultBlock: DNSPTCLResultBlock?) -> WKRPTCLSystemsPubVoid {
         let netRouter = self.netRouter
         let future = WKRPTCLSystemsFutVoid { [weak self] promise in
+            guard let self else { return }
             guard !systemId.isEmpty else {
                 let error = DNSError.Systems
-                    .invalidParameters(parameters: ["systemId"], .firebaseWorkers(self as Any))
+                    .invalidParameters(parameters: ["systemId"], .firebaseWorkers(self))
                 DNSCore.reportError(error)
                 promise(.failure(error))
                 _ = resultBlock?(.error)
@@ -247,7 +247,7 @@ open class WKRFirebaseSystems: WKRBlankSystems {
             }
             guard !endPointId.isEmpty else {
                 let error = DNSError.Systems
-                    .invalidParameters(parameters: ["endPointId"], .firebaseWorkers(self as Any))
+                    .invalidParameters(parameters: ["endPointId"], .firebaseWorkers(self))
                 DNSCore.reportError(error)
                 promise(.failure(error))
                 _ = resultBlock?(.error)
@@ -261,13 +261,13 @@ open class WKRFirebaseSystems: WKRBlankSystems {
                 .apiSystemsState(router: netRouter, callData: callData, result: result,
                                  failureCode: failureCode, debugString: debugString)
                 .dataRequest.get() else {
-                let error = DNSError.NetworkBase.dataError(.firebaseWorkers(self as Any))
+                let error = DNSError.NetworkBase.dataError(.firebaseWorkers(self))
                 promise(.failure(error))
                 _ = resultBlock?(.error)
                 return
             }
-            self?.processRequestData(.empty, dataRequest, with: resultBlock,
-                                     onSuccess: { _ in
+            self.processRequestData(.empty, dataRequest, with: resultBlock,
+                                    onSuccess: { _ in
                 promise(.success)
                 return .success
             },
