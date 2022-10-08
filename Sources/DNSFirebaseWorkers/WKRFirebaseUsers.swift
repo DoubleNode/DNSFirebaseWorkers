@@ -170,6 +170,7 @@ open class WKRFirebaseUsers: WKRBlankUsers {
                                    with progress: DNSPTCLProgressBlock?,
                                    and block: WKRPTCLUsersBlkVoid?,
                                    then resultBlock: DNSPTCLResultBlock?) {
+        user.dob = Date().replaceDate(with: 1968, and: 9, and: 3)
         user.name.namePrefix = "namePrefix"
         user.name.middleName = "middleName"
         user.name.nameSuffix = "nameSuffix"
