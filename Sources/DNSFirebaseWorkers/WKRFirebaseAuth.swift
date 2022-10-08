@@ -27,17 +27,22 @@ public typealias WKRFirebaseAuthBlkUserString = (WKRFirebaseAuthResUserString) -
 
 open class WKRFirebaseAuthAccessData: WKRPTCLAuthAccessData, Codable, NSCopying {
     public enum CodingKeys: String, CodingKey {
-        case accessToken, appleUserId, method, userId, userFirstName, userLastName, userEmail
+        case accessToken, appleUserId, method, userId, userName, userEmail
     }
     
     public var accessToken: String = ""
     public var appleUserId: String = ""
     public var method: WKRFirebaseAuth.Method = .default
     public var userId: String = ""
-    public var userFirstName: String = ""
-    public var userLastName: String = ""
+    public var userName = PersonNameComponents()
     public var userEmail: String = ""
     
+    // name formatted output
+    public var nameAbbreviated: String { self.userName.dnsFormatName(style: .abbreviated) }
+    public var nameMedium: String { self.userName.dnsFormatName(style: .medium) }
+    public var nameLong: String { self.userName.dnsFormatName(style: .long) }
+    public var nameShort: String { self.userName.dnsFormatName(style: .short) }
+
     required public init() { }
     
     // MARK: - DAO copy methods -
@@ -49,8 +54,7 @@ open class WKRFirebaseAuthAccessData: WKRPTCLAuthAccessData, Codable, NSCopying 
         self.appleUserId = object.appleUserId
         self.method = object.method
         self.userId = object.userId
-        self.userFirstName = object.userFirstName
-        self.userLastName = object.userLastName
+        self.userName = object.userName
         self.userEmail = object.userEmail
     }
 
@@ -61,8 +65,7 @@ open class WKRFirebaseAuthAccessData: WKRPTCLAuthAccessData, Codable, NSCopying 
         appleUserId = try container.decode(String.self, forKey: .appleUserId)
         method = WKRFirebaseAuth.Method(rawValue: try container.decode(String.self, forKey: .method)) ?? .default
         userId = try container.decode(String.self, forKey: .userId)
-        userFirstName = try container.decode(String.self, forKey: .userFirstName)
-        userLastName = try container.decode(String.self, forKey: .userLastName)
+        userName = try container.decode(PersonNameComponents.self, forKey: .userName)
         userEmail = try container.decode(String.self, forKey: .userEmail)
     }
     open func encode(to encoder: Encoder) throws {
@@ -71,8 +74,7 @@ open class WKRFirebaseAuthAccessData: WKRPTCLAuthAccessData, Codable, NSCopying 
         try container.encode(appleUserId, forKey: .appleUserId)
         try container.encode(method.rawValue, forKey: .method)
         try container.encode(userId, forKey: .userId)
-        try container.encode(userFirstName, forKey: .userFirstName)
-        try container.encode(userLastName, forKey: .userLastName)
+        try container.encode(userName, forKey: .userName)
         try container.encode(userEmail, forKey: .userEmail)
     }
     
@@ -88,8 +90,7 @@ open class WKRFirebaseAuthAccessData: WKRPTCLAuthAccessData, Codable, NSCopying 
             lhs.appleUserId != rhs.appleUserId ||
             lhs.method != rhs.method ||
             lhs.userId != rhs.userId ||
-            lhs.userFirstName != rhs.userFirstName ||
-            lhs.userLastName != rhs.userLastName ||
+            lhs.userName != rhs.userName ||
             lhs.userEmail != rhs.userEmail
     }
 
@@ -466,12 +467,10 @@ open class WKRFirebaseAuth: WKRBlankAuth, ASAuthorizationControllerDelegate, ASA
             print("Apple Password: \(applePassword)")
         } else if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
             let appleUserId = appleIDCredential.user
-            let userFirstName = appleIDCredential.fullName?.givenName ?? ""
-            let userLastName = appleIDCredential.fullName?.familyName ?? ""
+            let userName = appleIDCredential.fullName
             let userEmail = appleIDCredential.email ?? ""
             print("Apple User ID: \(appleUserId)")
-            print("User First Name: \(userFirstName)")
-            print("User Last Name: \(userLastName)")
+            print("User Name: \(userName?.debugDescription ?? "<none>")")
             print("User Email: \(userEmail)")
             guard let nonce = appleFlowCurrentNonce else {
                 let error = DNSError.Auth.invalidParameters(parameters: ["appleFlowCurrentNonce"],
@@ -567,8 +566,7 @@ open class WKRFirebaseAuth: WKRBlankAuth, ASAuthorizationControllerDelegate, ASA
                                 data.appleUserId = appleUserId
                                 data.method = .apple
                                 data.userId = currentUser.uid
-                                data.userFirstName = userFirstName.isEmpty ? self.accessData.userFirstName : userFirstName
-                                data.userLastName = userLastName
+                                data.userName = userName ?? self.accessData.userName
                                 data.userEmail = userEmail
                                 self.accessData = data
                                 self.utilityAccessDataSave()
@@ -618,8 +616,7 @@ open class WKRFirebaseAuth: WKRBlankAuth, ASAuthorizationControllerDelegate, ASA
                         data.appleUserId = appleUserId
                         data.method = .apple
                         data.userId = currentUser.uid
-                        data.userFirstName = userFirstName.isEmpty ? self.accessData.userFirstName : userFirstName
-                        data.userLastName = userLastName
+                        data.userName = userName ?? self.accessData.userName
                         data.userEmail = userEmail
                         self.accessData = data
                         self.utilityAccessDataSave()
