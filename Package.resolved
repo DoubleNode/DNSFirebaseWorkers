@@ -59,8 +59,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/DoubleNode/DNSBlankWorkers.git",
       "state" : {
-        "revision" : "0f6ca35fbad845ebd09c30f732d526a57d1a52e5",
-        "version" : "1.9.73"
+        "revision" : "d791401d98e5815fd2c398c9492db10ae94225db",
+        "version" : "1.9.74"
       }
     },
     {
@@ -68,8 +68,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/DoubleNode/DNSCore.git",
       "state" : {
-        "revision" : "7672854e2eb07348259af4ceaea2eb81a49aa4c3",
-        "version" : "1.9.42"
+        "revision" : "f79f056cae904d26f22e219017ca5153b2d7bb13",
+        "version" : "1.9.43"
       }
     },
     {
@@ -95,8 +95,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/DoubleNode/DNSCrashWorkers.git",
       "state" : {
-        "revision" : "940663dcd6d6f403c4aaeaae534edc5d80c9ae6c",
-        "version" : "1.9.57"
+        "revision" : "b44020790fde9f0805ea4cfeed079b3e231a0e62",
+        "version" : "1.9.58"
       }
     },
     {
@@ -104,8 +104,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/DoubleNode/DNSDataObjects.git",
       "state" : {
-        "revision" : "fff122c1d6251a8fad4d25dfc066653ab8ace90d",
-        "version" : "1.9.44"
+        "revision" : "49babda308e11e43d7c5b774ec279c41e529e726",
+        "version" : "1.9.46"
       }
     },
     {
@@ -122,8 +122,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/DoubleNode/DNSProtocols.git",
       "state" : {
-        "revision" : "7e59ac7c44378104c9525f16d90a92d9c3bf26ea",
-        "version" : "1.9.99"
+        "revision" : "f55d251ebf4a298577baef66b6829847035ba4d2",
+        "version" : "1.9.101"
       }
     },
     {
@@ -131,8 +131,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/firebase/firebase-ios-sdk",
       "state" : {
-        "revision" : "7f31a43f8c49bd4a1723bc9fecdfaa4411dd9f36",
-        "version" : "9.5.0"
+        "revision" : "7e80c25b51c2ffa238879b07fbfc5baa54bb3050",
+        "version" : "9.6.0"
       }
     },
     {
@@ -149,8 +149,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/google/GoogleAppMeasurement.git",
       "state" : {
-        "revision" : "f54f60d0164d887e1174fa51ab2efe48a8e9d178",
-        "version" : "9.3.0"
+        "revision" : "c1cfde8067668027b23a42c29d11c246152fe046",
+        "version" : "9.6.0"
       }
     },
     {
