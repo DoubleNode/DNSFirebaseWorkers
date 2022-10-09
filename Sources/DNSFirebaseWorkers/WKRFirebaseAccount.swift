@@ -20,7 +20,10 @@ open class WKRFirebaseAccount: WKRBlankAccount {
 
     // MARK: - Class Factory methods -
     public static var accountType: DAOAccount.Type = DAOAccount.self
+    public static var accountsResponseType: WKRFirebaseAccountAAccountsResponse.Type = WKRFirebaseAccountAAccountsResponse.self
+
     open class var account: DAOAccount.Type { accountType }
+    open class var accountsResponse: WKRFirebaseAccountAAccountsResponse.Type { accountsResponseType }
 
     open class func createAccount() -> DAOAccount { account.init() }
     open class func createAccount(from object: DAOAccount) -> DAOAccount { account.init(from: object) }
@@ -130,8 +133,8 @@ open class WKRFirebaseAccount: WKRBlankAccount {
         self.processRequestData(callData, dataRequest, with: resultBlock,
                                 onSuccess: { data in
             do {
-                let accountsResponse = try AccountsResponse.keyed.fromJSON(data)
-                block?(.success(accountsResponse.accounts))
+                let response = try Self.accountsResponse.keyed.fromJSON(data)
+                block?(.success(response.accounts))
                 return .success
             } catch {
                 DNSCore.reportError(error)
