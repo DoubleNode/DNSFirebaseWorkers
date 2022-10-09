@@ -130,8 +130,8 @@ open class WKRFirebaseAccount: WKRBlankAccount {
         self.processRequestData(callData, dataRequest, with: resultBlock,
                                 onSuccess: { data in
             do {
-                let accountsResponse = try AccountsResponse.keyed.fromJSON(data)
-                block?(.success(accountsResponse.accounts))
+                let response = try WKRFirebaseAccountAAccountsResponse.keyed.fromJSON(data)
+                block?(.success(response.accounts))
                 return .success
             } catch {
                 DNSCore.reportError(error)

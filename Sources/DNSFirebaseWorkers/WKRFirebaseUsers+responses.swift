@@ -15,22 +15,29 @@ import DNSProtocols
 import Foundation
 import KeyedCodable
 
-extension WKRFirebaseUsers {
-    public enum UserArrayTransformer: Transformer {
-        public typealias Destination = [DAOUser]
-        public typealias Object = [DAOUser]
-
-        public static func transform(from decodable: [DAOUser]) -> Any? {
-            decodable.compactMap { WKRFirebaseUsers.createUser(from: $0) }
-        }
-        public static func transform(object: [DAOUser]) throws -> [DAOUser]? {
-            object as Destination
-        }
-    }
-    struct UsersResponse: Codable {
-        @CodedBy<UserArrayTransformer> var users: [DAOUser]
-        enum CodingKeys: String, KeyedKey {
-            case users = ".users"
-        }
+open class WKRFirebaseUsersAUsersResponse: Codable {
+    open var users: [DAOUser]
+    enum CodingKeys: String, KeyedKey {
+        case users = ".users"
     }
 }
+
+//extension WKRFirebaseUsers {
+//    public enum UserArrayTransformer: Transformer {
+//        public typealias Destination = [DAOUser]
+//        public typealias Object = [DAOUser]
+//
+//        public static func transform(from decodable: [DAOUser]) -> Any? {
+//            decodable.compactMap { WKRFirebaseUsers.createUser(from: $0) }
+//        }
+//        public static func transform(object: [DAOUser]) throws -> [DAOUser]? {
+//            object as Destination
+//        }
+//    }
+//    struct UsersResponse: Codable {
+//        @CodedBy<UserArrayTransformer> var users: [DAOUser]
+//        enum CodingKeys: String, KeyedKey {
+//            case users = ".users"
+//        }
+//    }
+//}

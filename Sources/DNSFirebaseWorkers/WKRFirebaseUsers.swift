@@ -141,8 +141,8 @@ open class WKRFirebaseUsers: WKRBlankUsers {
         self.processRequestData(callData, dataRequest, with: resultBlock,
                                 onSuccess: { data in
             do {
-                let usersResponse = try UsersResponse.keyed.fromJSON(data)
-                block?(.success(usersResponse.users))
+                let response = try WKRFirebaseUsersAUsersResponse.keyed.fromJSON(data)
+                block?(.success(response.users))
                 return .success
             } catch {
                 DNSCore.reportError(error)
