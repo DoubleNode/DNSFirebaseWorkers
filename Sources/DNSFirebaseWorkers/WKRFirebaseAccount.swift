@@ -26,6 +26,13 @@ open class WKRFirebaseAccount: WKRBlankAccount {
     open class func createAccount(from object: DAOAccount) -> DAOAccount { account.init(from: object) }
     open class func createAccount(from data: DNSDataDictionary) -> DAOAccount? { account.init(from: data) }
 
+    // MARK: - Class Response methods -
+    public static var accountsResponseType: PTCLWKRFirebaseAccountAAccountsResponse.Type = WKRFirebaseAccountAAccountsResponse.self
+    open class func accountsResponse(_ data: Data) throws -> PTCLWKRFirebaseAccountAAccountsResponse {
+        let retval = try WKRFirebaseAccountAAccountsResponse.keyed.fromJSON(data)
+        return retval
+    }
+
     // MARK: - Internal Work Methods
     override open func intDoActivate(account: DAOAccount,
                                      with progress: DNSPTCLProgressBlock?,
@@ -113,6 +120,41 @@ open class WKRFirebaseAccount: WKRBlankAccount {
             block?(.failure(error))
         })
     }
+    override open func intDoLoadAccount(for id: String,
+                                        with progress: DNSPTCLProgressBlock?,
+                                        and block: WKRPTCLAccountBlkAccount?,
+                                        then resultBlock: DNSPTCLResultBlock?) {
+        let callData = WKRPTCLSystemsStateData(system: DNSAppConstants.Systems.accounts,
+                                               endPoint: DNSAppConstants.Systems.Accounts.EndPoints.loadAccount,
+                                               sendDebug: DNSAppConstants.Systems.Accounts.sendDebug)
+
+        guard let dataRequest = try? API.apiLoadAccount(router: self.netRouter, accountId: id)
+            .dataRequest.get() else {
+            let error = DNSError.NetworkBase.dataError(.firebaseWorkers(self))
+            block?(.failure(error)); _ = resultBlock?(.error)
+            return
+        }
+        self.processRequestData(callData, dataRequest, with: resultBlock,
+                                onSuccess: { data in
+            do {
+                let user = try JSONDecoder().decode(Self.accountType, from: data)
+                block?(.success(user))
+                return .success
+            } catch {
+                DNSCore.reportError(error)
+                return .failure(error)
+            }
+        },
+                                onPendingError: { error, _ in
+            if case DNSError.NetworkBase.expiredAccessToken = error {
+                return error
+            }
+            return DNSError.NetworkBase.lowerError(error: error, .firebaseWorkers(self))
+        },
+                                onError: { error, _ in
+            block?(.failure(error))
+        })
+    }
     override open func intDoLoadAccounts(for user: DAOUser,
                                          with progress: DNSPTCLProgressBlock?,
                                          and block: WKRPTCLAccountBlkAAccount?,
@@ -130,8 +172,9 @@ open class WKRFirebaseAccount: WKRBlankAccount {
         self.processRequestData(callData, dataRequest, with: resultBlock,
                                 onSuccess: { data in
             do {
-                let accountsResponse = try AccountsResponse.keyed.fromJSON(data)
-                block?(.success(accountsResponse.accounts))
+                let response = try JSONDecoder().decode(Self.accountsResponseType, from: data)
+//                let response = try Self.accountsResponse(data)
+                block?(.success(response.accounts))
                 return .success
             } catch {
                 DNSCore.reportError(error)
