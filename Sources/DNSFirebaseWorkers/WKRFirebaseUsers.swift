@@ -128,14 +128,36 @@ open class WKRFirebaseUsers: WKRBlankUsers {
                                       with progress: DNSPTCLProgressBlock?,
                                       and block: WKRPTCLUsersBlkAUser?,
                                       then resultBlock: DNSPTCLResultBlock?) {
-        let systemStateSystem = DNSAppConstants.Systems.users
-        let systemStateEndPoint = DNSAppConstants.Systems.Users.EndPoints.loadUser
-//        let systemStateSendDebug = DNSAppConstants.Systems.Users.sendDebug
+        let callData = WKRPTCLSystemsStateData(system: DNSAppConstants.Systems.users,
+                                               endPoint: DNSAppConstants.Systems.Users.EndPoints.loadUsers,
+                                               sendDebug: DNSAppConstants.Systems.Users.sendDebug)
 
-        self.utilityReportSystemSuccess(for: systemStateSystem, and: systemStateEndPoint)
-        let error = DNSError.Users.notFound(field: "account", value: account.id, .firebaseWorkers(self))
-        block?(.failure(error))
-        _ = resultBlock?(.notFound)
+        guard let dataRequest = try? API.apiLoadUsers(router: self.netRouter, account: account)
+            .dataRequest.get() else {
+            let error = DNSError.NetworkBase.dataError(.firebaseWorkers(self))
+            block?(.failure(error)); _ = resultBlock?(.error)
+            return
+        }
+        self.processRequestData(callData, dataRequest, with: resultBlock,
+                                onSuccess: { data in
+            do {
+                let usersResponse = try UsersResponse.keyed.fromJSON(data)
+                block?(.success(usersResponse.users))
+                return .success
+            } catch {
+                DNSCore.reportError(error)
+                return .failure(error)
+            }
+        },
+                                onPendingError: { error, _ in
+            if case DNSError.NetworkBase.expiredAccessToken = error {
+                return error
+            }
+            return DNSError.NetworkBase.lowerError(error: error, .firebaseWorkers(self))
+        },
+                                onError: { error, _ in
+            block?(.failure(error))
+        })
     }
     override open func intDoRemove(_ user: DAOUser,
                                    with progress: DNSPTCLProgressBlock?,
@@ -170,12 +192,6 @@ open class WKRFirebaseUsers: WKRBlankUsers {
                                    with progress: DNSPTCLProgressBlock?,
                                    and block: WKRPTCLUsersBlkVoid?,
                                    then resultBlock: DNSPTCLResultBlock?) {
-        user.dob = Date().replaceDate(with: 1968, and: 9, and: 3)
-        user.name.namePrefix = "namePrefix"
-        user.name.middleName = "middleName"
-        user.name.nameSuffix = "nameSuffix"
-        user.name.nickname = "nickname"
-
         let callData = WKRPTCLSystemsStateData(system: DNSAppConstants.Systems.users,
                                                endPoint: DNSAppConstants.Systems.Users.EndPoints.updateUser,
                                                sendDebug: DNSAppConstants.Systems.Users.sendDebug)

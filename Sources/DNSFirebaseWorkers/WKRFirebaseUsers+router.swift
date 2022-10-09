@@ -25,6 +25,8 @@ open class WKRFirebaseUsersRouter: NETBlankRouter {
             return apiActivate(user)
         case .apiLoadUser(_, let userId):
             return apiLoadUser(userId)
+        case .apiLoadUsers(_, let account):
+            return apiLoadUsers(account)
         case .apiRemove(_, let user):
             return apiRemove(user)
         case .apiUpdate(_, let user):
@@ -62,6 +64,25 @@ open class WKRFirebaseUsersRouter: NETBlankRouter {
 
         var components = try! componentsResult.get() // swiftlint:disable:this force_try
         components.path += "/users/\(userId)"
+        guard let url = components.url else {
+            let error = DNSError.NetworkBase.invalidUrl(.firebaseWorkers(self))
+            DNSCore.reportError(error)
+            return .failure(error)
+        }
+
+        let requestResult = super.urlRequest(using: url)
+        if case .failure(let error) = requestResult { DNSCore.reportError(error); return .failure(error) }
+
+        var request = try! requestResult.get() // swiftlint:disable:this force_try
+        request.method = .get
+        return .success(request)
+    }
+    open func apiLoadUsers(_ account: DAOAccount) -> NETPTCLRouterResURLRequest {
+        let componentsResult = netConfig.urlComponents()
+        if case .failure(let error) = componentsResult { DNSCore.reportError(error); return .failure(error) }
+
+        var components = try! componentsResult.get() // swiftlint:disable:this force_try
+        components.path += "/accounts/\(account.id)/users"
         guard let url = components.url else {
             let error = DNSError.NetworkBase.invalidUrl(.firebaseWorkers(self))
             DNSCore.reportError(error)

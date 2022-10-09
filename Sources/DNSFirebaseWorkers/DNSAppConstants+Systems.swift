@@ -140,6 +140,7 @@ public extension DNSAppConstants {
                 static public let activate = "activate"
                 static public let clearIdentity = "clearIdentity"
                 static public let loadUser = "loadUser"
+                static public let loadUsers = "loadUsers"
                 static public let setIdentity = "setIdentity"
                 static public let removeUser = "removeUser"
                 static public let updateUser = "updateUser"
