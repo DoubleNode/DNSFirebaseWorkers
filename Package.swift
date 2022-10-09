@@ -27,13 +27,13 @@ let package = Package(
     dependencies: [
         // Dependencies declare other packages that this package depends on.
         .package(url: "https://github.com/DoubleNodeOpen/AtomicSwift.git", from: "1.2.2"),
-        .package(url: "https://github.com/DoubleNode/DNSBlankWorkers.git", from: "1.9.76"),
-        .package(url: "https://github.com/DoubleNode/DNSCore.git", from: "1.9.47"),
+        .package(url: "https://github.com/DoubleNode/DNSBlankWorkers.git", from: "1.9.77"),
+        .package(url: "https://github.com/DoubleNode/DNSCore.git", from: "1.9.48"),
         .package(url: "https://github.com/DoubleNode/DNSCoreThreading.git", from: "1.9.0"),
-        .package(url: "https://github.com/DoubleNode/DNSCrashWorkers.git", from: "1.9.59"),
-        .package(url: "https://github.com/DoubleNode/DNSDataObjects.git", from: "1.9.49"),
+        .package(url: "https://github.com/DoubleNode/DNSCrashWorkers.git", from: "1.9.60"),
+        .package(url: "https://github.com/DoubleNode/DNSDataObjects.git", from: "1.9.50"),
         .package(url: "https://github.com/DoubleNode/DNSError.git", from: "1.9.2"),
-        .package(url: "https://github.com/DoubleNode/DNSProtocols.git", from: "1.9.104"),
+        .package(url: "https://github.com/DoubleNode/DNSProtocols.git", from: "1.9.105"),
         .package(url: "https://github.com/firebase/firebase-ios-sdk.git", from: "9.6.0"),
         .package(url: "https://github.com/dgrzeszczak/KeyedCodable.git", from: "3.1.2"),
     ],

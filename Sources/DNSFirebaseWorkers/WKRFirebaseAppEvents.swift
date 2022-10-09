@@ -18,11 +18,10 @@ import FirebaseFirestore
 open class WKRFirebaseAppEvents: WKRBlankAppEvents {
     // MARK: - Class Factory methods -
     public static var appEventType: DAOAppEvent.Type = DAOAppEvent.self
-    open class var appEvent: DAOAppEvent.Type { appEventType }
 
-    open class func createAppEvent() -> DAOAppEvent { appEvent.init() }
-    open class func createAppEvent(from object: DAOAppEvent) -> DAOAppEvent { appEvent.init(from: object) }
-    open class func createAppEvent(from data: DNSDataDictionary) -> DAOAppEvent? { appEvent.init(from: data) }
+    open class func createAppEvent() -> DAOAppEvent { appEventType.init() }
+    open class func createAppEvent(from object: DAOAppEvent) -> DAOAppEvent { appEventType.init(from: object) }
+    open class func createAppEvent(from data: DNSDataDictionary) -> DAOAppEvent? { appEventType.init(from: data) }
 
     // MARK: - Properties -
     let db = Firestore.firestore()

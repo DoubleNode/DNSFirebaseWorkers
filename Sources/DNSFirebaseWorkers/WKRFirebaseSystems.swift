@@ -22,9 +22,6 @@ open class WKRFirebaseSystems: WKRBlankSystems {
     public static var systemEndPointType: DAOSystemEndPoint.Type = DAOSystemEndPoint.self
     public static var systemStateType: DAOSystemState.Type = DAOSystemState.self
     public static var systemType: DAOSystem.Type = DAOSystem.self
-    open class var systemEndPoint: DAOSystemEndPoint.Type { systemEndPointType }
-    open class var systemState: DAOSystemState.Type { systemStateType }
-    open class var system: DAOSystem.Type { systemType }
 
     open class func createSystemEndPoint() -> DAOSystemEndPoint { systemEndPointType.init() }
     open class func createSystemEndPoint(from object: DAOSystemEndPoint) -> DAOSystemEndPoint { systemEndPointType.init(from: object) }

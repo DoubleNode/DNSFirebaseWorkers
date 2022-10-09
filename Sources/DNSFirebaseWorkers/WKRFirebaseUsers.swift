@@ -14,17 +14,20 @@ import DNSError
 import DNSProtocols
 import FirebaseAuth
 import Foundation
+import KeyedCodable
 
 open class WKRFirebaseUsers: WKRBlankUsers {
     typealias API = WKRFirebaseUsersAPI // swiftlint:disable:this type_name
 
     // MARK: - Class Factory methods -
     public static var userType: DAOUser.Type = DAOUser.self
-    open class var user: DAOUser.Type { userType }
 
-    open class func createUser() -> DAOUser { user.init() }
-    open class func createUser(from object: DAOUser) -> DAOUser { user.init(from: object) }
-    open class func createUser(from data: DNSDataDictionary) -> DAOUser? { user.init(from: data) }
+    open class func createUser() -> DAOUser { userType.init() }
+    open class func createUser(from object: DAOUser) -> DAOUser { userType.init(from: object) }
+    open class func createUser(from data: DNSDataDictionary) -> DAOUser? { userType.init(from: data) }
+
+    // MARK: - Class Response methods -
+    public static var usersResponseType: PTCLWKRFirebaseUsersAUsersResponse.Type = WKRFirebaseUsersAUsersResponse.self
 
     // MARK: - Internal Work Methods
     override open func intDoActivate(_ user: DAOUser,
@@ -141,8 +144,8 @@ open class WKRFirebaseUsers: WKRBlankUsers {
         self.processRequestData(callData, dataRequest, with: resultBlock,
                                 onSuccess: { data in
             do {
-                let usersResponse = try UsersResponse.keyed.fromJSON(data)
-                block?(.success(usersResponse.users))
+                let response = try JSONDecoder().decode(Self.usersResponseType, from: data)
+                block?(.success(response.users))
                 return .success
             } catch {
                 DNSCore.reportError(error)
