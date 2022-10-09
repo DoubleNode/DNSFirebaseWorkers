@@ -26,6 +26,12 @@ open class WKRFirebaseAccount: WKRBlankAccount {
     open class func createAccount(from object: DAOAccount) -> DAOAccount { account.init(from: object) }
     open class func createAccount(from data: DNSDataDictionary) -> DAOAccount? { account.init(from: data) }
 
+    // MARK: - Class Response methods -
+    open class func accountsResponse(_ data: Data) throws -> PTCLWKRFirebaseAccountAAccountsResponse {
+        let retval = try WKRFirebaseAccountAAccountsResponse.keyed.fromJSON(data)
+        return retval
+    }
+
     // MARK: - Internal Work Methods
     override open func intDoActivate(account: DAOAccount,
                                      with progress: DNSPTCLProgressBlock?,
@@ -130,8 +136,8 @@ open class WKRFirebaseAccount: WKRBlankAccount {
         self.processRequestData(callData, dataRequest, with: resultBlock,
                                 onSuccess: { data in
             do {
-                let accountsResponse = try AccountsResponse.keyed.fromJSON(data)
-                block?(.success(accountsResponse.accounts))
+                let response = try Self.accountsResponse(data)
+                block?(.success(response.accounts))
                 return .success
             } catch {
                 DNSCore.reportError(error)
