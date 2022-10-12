@@ -15,18 +15,29 @@ import DNSProtocols
 import Foundation
 import KeyedCodable
 
-open class WKRFirebaseAccount: WKRBlankAccount {
+public protocol PTCLCFGWKRFirebaseAccount: PTCLCFGDAOAccount {
+    var accountsResponseType: any PTCLRSPWKRFirebaseAccountAAccount.Type { get }
+}
+public class CFGWKRFirebaseAccount: PTCLCFGWKRFirebaseAccount {
+    public var accountsResponseType: any PTCLRSPWKRFirebaseAccountAAccount.Type = RSPWKRFirebaseAccountAAccount.self
+    public var accountType: DAOAccount.Type = DAOAccount.self
+
+    open func accountArray<K>(from container: KeyedDecodingContainer<K>,
+                              forKey key: KeyedDecodingContainer<K>.Key) -> [DAOAccount] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOAccount].self, forKey: key, configuration: self) ?? [] } catch { }
+        return []
+    }
+}
+open class WKRFirebaseAccount: WKRBlankAccount, DecodingConfigurationProviding, EncodingConfigurationProviding {
+    public typealias Config = PTCLCFGWKRFirebaseAccount
+    public typealias DecodingConfiguration = Config
+    public typealias EncodingConfiguration = Config
+    public static var config: Config = CFGWKRFirebaseAccount()
+
+    public static var decodingConfiguration: DecodingConfiguration { Self.config }
+    public static var encodingConfiguration: EncodingConfiguration { Self.config }
+
     typealias API = WKRFirebaseAccountAPI // swiftlint:disable:this type_name
-
-    // MARK: - Class Factory methods -
-    public static var accountType: DAOAccount.Type = DAOAccount.self
-
-    open class func createAccount() -> DAOAccount { accountType.init() }
-    open class func createAccount(from object: DAOAccount) -> DAOAccount { accountType.init(from: object) }
-    open class func createAccount(from data: DNSDataDictionary) -> DAOAccount? { accountType.init(from: data) }
-
-    // MARK: - Class Response methods -
-    public static var accountsResponseType: PTCLWKRFirebaseAccountAAccountsResponse.Type = WKRFirebaseAccountAAccountsResponse.self
 
     // MARK: - Internal Work Methods
     override open func intDoActivate(account: DAOAccount,
@@ -132,7 +143,7 @@ open class WKRFirebaseAccount: WKRBlankAccount {
         self.processRequestData(callData, dataRequest, with: resultBlock,
                                 onSuccess: { data in
             do {
-                let user = try JSONDecoder().decode(Self.accountType, from: data)
+                let user = try JSONDecoder().decode(Self.config.accountType, from: data)
                 block?(.success(user))
                 return .success
             } catch {
@@ -167,7 +178,7 @@ open class WKRFirebaseAccount: WKRBlankAccount {
         self.processRequestData(callData, dataRequest, with: resultBlock,
                                 onSuccess: { data in
             do {
-                let response = try JSONDecoder().decode(Self.accountsResponseType, from: data)
+                let response = try JSONDecoder().decode(Self.config.accountsResponseType, from: data)
                 block?(.success(response.accounts))
                 return .success
             } catch {

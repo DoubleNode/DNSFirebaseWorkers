@@ -15,14 +15,31 @@ import DNSProtocols
 import Foundation
 import KeyedCodable
 
-public protocol PTCLWKRFirebaseUsersAUsersResponse: Codable {
+public protocol PTCLRSPWKRFirebaseUsersAUser: Codable {  // , CodableWithConfiguration {
     var users: [DAOUser] { get }
 }
-public class WKRFirebaseUsersAUsersResponse: PTCLWKRFirebaseUsersAUsersResponse {
-    public var users: [DAOUser] { _users }
-    
-    private var _users: [DAOUser] = []
-    public enum CodingKeys: String, KeyedKey {
-        case _users = "users"
-    }
+public struct RSPWKRFirebaseUsersAUser: PTCLRSPWKRFirebaseUsersAUser { // , DecodingConfigurationProviding, EncodingConfigurationProviding {
+//    static let xlt = DNSDataTranslation()
+//    public typealias Config = PTCLCFGWKRFirebaseUser
+//    public typealias DecodingConfiguration = Config
+//    public typealias EncodingConfiguration = Config
+
+    // MARK: - Properties -
+//    public enum CodingKeys: String, CodingKey {
+//        case users
+//    }
+
+//    @CodableConfiguration(from: WKRFirebaseUsers.self)
+    public var users: [DAOUser] = []
+
+//    public init(from decoder: Decoder) throws {
+//        let container = try decoder.container(keyedBy: CodingKeys.self)
+//        users = Self.xlt.daoUserArray(with: WKRFirebaseUsers.decodingConfiguration,
+//                                      from: container, forKey: .users)
+//    }
+//
+//    public func encode(to encoder: Encoder) throws {
+//        var container = encoder.container(keyedBy: CodingKeys.self)
+//        try container.encode(users, forKey: .users)
+//    }
 }

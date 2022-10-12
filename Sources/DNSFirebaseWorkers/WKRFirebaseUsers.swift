@@ -16,18 +16,29 @@ import FirebaseAuth
 import Foundation
 import KeyedCodable
 
+public protocol PTCLCFGWKRFirebaseUsers: PTCLCFGDAOUser {
+    var usersResponseType: any PTCLRSPWKRFirebaseUsersAUser.Type { get }
+}
+public class CFGWKRFirebaseUsers: PTCLCFGWKRFirebaseUsers {
+    public var usersResponseType: any PTCLRSPWKRFirebaseUsersAUser.Type = RSPWKRFirebaseUsersAUser.self
+    public var userType: DAOUser.Type = DAOUser.self
+
+    open func userArray<K>(from container: KeyedDecodingContainer<K>,
+                           forKey key: KeyedDecodingContainer<K>.Key) -> [DAOUser] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOUser].self, forKey: key, configuration: self) ?? [] } catch { }
+        return []
+    }
+}
 open class WKRFirebaseUsers: WKRBlankUsers {
+    public typealias Config = PTCLCFGWKRFirebaseUsers
+    public typealias DecodingConfiguration = Config
+    public typealias EncodingConfiguration = Config
+    public static var config: Config = CFGWKRFirebaseUsers()
+
+    public static var decodingConfiguration: DecodingConfiguration { Self.config }
+    public static var encodingConfiguration: EncodingConfiguration { Self.config }
+
     typealias API = WKRFirebaseUsersAPI // swiftlint:disable:this type_name
-
-    // MARK: - Class Factory methods -
-    public static var userType: DAOUser.Type = DAOUser.self
-
-    open class func createUser() -> DAOUser { userType.init() }
-    open class func createUser(from object: DAOUser) -> DAOUser { userType.init(from: object) }
-    open class func createUser(from data: DNSDataDictionary) -> DAOUser? { userType.init(from: data) }
-
-    // MARK: - Class Response methods -
-    public static var usersResponseType: PTCLWKRFirebaseUsersAUsersResponse.Type = WKRFirebaseUsersAUsersResponse.self
 
     // MARK: - Internal Work Methods
     override open func intDoActivate(_ user: DAOUser,
@@ -109,7 +120,7 @@ open class WKRFirebaseUsers: WKRBlankUsers {
         self.processRequestData(callData, dataRequest, with: resultBlock,
                                 onSuccess: { data in
             do {
-                let user = try JSONDecoder().decode(Self.userType, from: data)
+                let user = try JSONDecoder().decode(Self.config.userType, from: data)
                 block?(.success(user))
                 return .success
             } catch {
@@ -144,7 +155,7 @@ open class WKRFirebaseUsers: WKRBlankUsers {
         self.processRequestData(callData, dataRequest, with: resultBlock,
                                 onSuccess: { data in
             do {
-                let response = try JSONDecoder().decode(Self.usersResponseType, from: data)
+                let response = try JSONDecoder().decode(Self.config.usersResponseType, from: data)
                 block?(.success(response.users))
                 return .success
             } catch {
