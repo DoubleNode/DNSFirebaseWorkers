@@ -15,25 +15,53 @@ import DNSError
 import DNSProtocols
 import FirebaseFirestore
 
+public protocol PTCLCFGWKRFirebaseSystems: PTCLCFGDAOSystem, PTCLCFGDAOSystemEndPoint, PTCLCFGDAOSystemState {
+}
+public class CFGWKRFirebaseSystems: PTCLCFGWKRFirebaseSystems {
+    public var systemType: DAOSystem.Type = DAOSystem.self
+    public var systemEndPointType: DAOSystemEndPoint.Type = DAOSystemEndPoint.self
+    public var systemStateType: DAOSystemState.Type = DAOSystemState.self
+    open func systemArray<K>(from container: KeyedDecodingContainer<K>,
+                             forKey key: KeyedDecodingContainer<K>.Key) -> [DAOSystem] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOSystem].self, forKey: key, configuration: self) ?? [] } catch { }
+        return []
+    }
+    open func systemEndPointArray<K>(from container: KeyedDecodingContainer<K>,
+                                     forKey key: KeyedDecodingContainer<K>.Key) -> [DAOSystemEndPoint] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOSystemEndPoint].self, forKey: key, configuration: self) ?? [] } catch { }
+        return []
+    }
+    open func systemStateArray<K>(from container: KeyedDecodingContainer<K>,
+                                  forKey key: KeyedDecodingContainer<K>.Key) -> [DAOSystemState] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOSystemState].self, forKey: key, configuration: self) ?? [] } catch { }
+        return []
+    }
+
+}
 // swiftlint:disable:next type_body_length
-open class WKRFirebaseSystems: WKRBlankSystems {
+open class WKRFirebaseSystems: WKRBlankSystems, DecodingConfigurationProviding, EncodingConfigurationProviding {
+    public typealias Config = PTCLCFGWKRFirebaseSystems
+    public typealias DecodingConfiguration = Config
+    public typealias EncodingConfiguration = Config
+    public static var config: Config = CFGWKRFirebaseSystems()
+
+    public static var decodingConfiguration: DecodingConfiguration { Self.config }
+    public static var encodingConfiguration: EncodingConfiguration { Self.config }
+
     typealias API = WKRFirebaseSystemsAPI // swiftlint:disable:this type_name
+
     // MARK: - Class Factory methods -
-    public static var systemEndPointType: DAOSystemEndPoint.Type = DAOSystemEndPoint.self
-    public static var systemStateType: DAOSystemState.Type = DAOSystemState.self
-    public static var systemType: DAOSystem.Type = DAOSystem.self
+    open class func createSystemEndPoint() -> DAOSystemEndPoint { config.systemEndPointType.init() }
+    open class func createSystemEndPoint(from object: DAOSystemEndPoint) -> DAOSystemEndPoint { config.systemEndPointType.init(from: object) }
+    open class func createSystemEndPoint(from data: DNSDataDictionary) -> DAOSystemEndPoint? { config.systemEndPointType.init(from: data) }
 
-    open class func createSystemEndPoint() -> DAOSystemEndPoint { systemEndPointType.init() }
-    open class func createSystemEndPoint(from object: DAOSystemEndPoint) -> DAOSystemEndPoint { systemEndPointType.init(from: object) }
-    open class func createSystemEndPoint(from data: DNSDataDictionary) -> DAOSystemEndPoint? { systemEndPointType.init(from: data) }
+    open class func createSystemState() -> DAOSystemState { config.systemStateType.init() }
+    open class func createSystemState(from object: DAOSystemState) -> DAOSystemState { config.systemStateType.init(from: object) }
+    open class func createSystemState(from data: DNSDataDictionary) -> DAOSystemState? { config.systemStateType.init(from: data) }
 
-    open class func createSystemState() -> DAOSystemState { systemStateType.init() }
-    open class func createSystemState(from object: DAOSystemState) -> DAOSystemState { systemStateType.init(from: object) }
-    open class func createSystemState(from data: DNSDataDictionary) -> DAOSystemState? { systemStateType.init(from: data) }
-
-    open class func createSystem() -> DAOSystem { systemType.init() }
-    open class func createSystem(from object: DAOSystem) -> DAOSystem { systemType.init(from: object) }
-    open class func createSystem(from data: DNSDataDictionary) -> DAOSystem? { systemType.init(from: data) }
+    open class func createSystem() -> DAOSystem { config.systemType.init() }
+    open class func createSystem(from object: DAOSystem) -> DAOSystem { config.systemType.init(from: object) }
+    open class func createSystem(from data: DNSDataDictionary) -> DAOSystem? { config.systemType.init(from: data) }
 
     // MARK: - Properties -
     let db = Firestore.firestore()
@@ -209,7 +237,7 @@ open class WKRFirebaseSystems: WKRBlankSystems {
         self.processRequestData(.empty, dataRequest, with: resultBlock,
                                 onSuccess: { data in
             do {
-                let system = try JSONDecoder().decode(Self.systemType, from: data)
+                let system = try JSONDecoder().decode(Self.config.systemType, from: data)
                 block?(.success(system))
                 return .success
             } catch {
