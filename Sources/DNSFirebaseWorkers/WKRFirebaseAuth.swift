@@ -9,6 +9,7 @@ import AuthenticationServices
 import CryptoKit
 import DNSBlankWorkers
 import DNSCore
+import DNSCoreThreading
 import DNSCrashWorkers
 import DNSDataObjects
 import DNSError
@@ -503,6 +504,52 @@ open class WKRFirebaseAuth: WKRBlankAuth, ASAuthorizationControllerDelegate, ASA
                 _ = appleFlowResultBlock?(.failure(error))
                 return
             }
+            if userEmail.isEmpty {
+                // Initialize a Firebase credential.
+                let credential = OAuthProvider.credential(withProviderID: "apple.com",
+                                                          idToken: idTokenString,
+                                                          rawNonce: nonce)
+                Auth.auth().signIn(with: credential) { [weak self] authResult, error in
+                    guard let self else { return }
+                    if let error {
+                        self.utilityReportSystemFailure(sendDebug: systemStateSendDebug,
+                                                        debugString: error.localizedDescription,
+                                                        and: "???",
+                                                        for: systemStateSystem, and: systemStateEndPoint)
+                        self.appleFlowBlock?(.failure(error))
+                        _ = self.appleFlowResultBlock?(.failure(error))
+                        return
+                    }
+                    self.utilityGetIDToken { [weak self] result in
+                        guard let self else { return }
+                        if case .failure(let error) = result {
+                            self.utilityReportSystemFailure(sendDebug: systemStateSendDebug,
+                                                            debugString: error.localizedDescription,
+                                                            and: "???",
+                                                            for: systemStateSystem, and: systemStateEndPoint)
+                            self.appleFlowBlock?(.failure(error))
+                            _ = self.appleFlowResultBlock?(.failure(error))
+                            return
+                        }
+                        let (currentUser, idToken) = try! result.get() // swiftlint:disable:this force_try
+                        // User is signed in to Firebase with Apple.
+                        let data = Self.AccessData()
+                        data.accessToken = idToken
+                        data.appleUserId = appleUserId
+                        data.method = .apple
+                        data.userId = currentUser.uid
+                        data.userName = userName ?? self.accessData.userName
+                        data.userEmail = currentUser.email ?? self.accessData.userEmail
+                        self.accessData = data
+                        self.utilityAccessDataSave()
+                        
+                        self.utilityReportSystemSuccess(for: systemStateSystem, and: systemStateEndPoint)
+                        self.appleFlowBlock?(.success((true, self.accessData)))
+                        _ = self.appleFlowResultBlock?(.completed)
+                    }
+                }
+                return
+            }
             Auth.auth().fetchSignInMethods(forEmail: userEmail) { [weak self] methods, error in
                 guard let self else { return }
                 if let error {
@@ -676,18 +723,21 @@ open class WKRFirebaseAuth: WKRBlankAuth, ASAuthorizationControllerDelegate, ASA
         envelope.open(with: subscriber)
     }
     func utilityAccessDataSave() {
-        do {
-            let data = try JSONEncoder().encode(self.accessData)
-            let envelope = DNSSubscriberEnvelope()
-            let subscriber = self.wkrKeychain.doUpdate(object: data,
-                                                       for: DNSAppConstants.Auth.accessData)
-                .replaceError(with: ())
-                .sink { _ in
-                    envelope.close()
-                }
-            envelope.open(with: subscriber)
-        } catch {
-            print(error.localizedDescription)
+        DNSThread.run { [weak self] in
+            guard let self else { return }
+            do {
+                let data = try JSONEncoder().encode(self.accessData)
+                let envelope = DNSSubscriberEnvelope()
+                let subscriber = self.wkrKeychain.doUpdate(object: data,
+                                                           for: DNSAppConstants.Auth.accessData)
+                    .replaceError(with: ())
+                    .sink { _ in
+                        envelope.close()
+                    }
+                envelope.open(with: subscriber)
+            } catch {
+                print(error.localizedDescription)
+            }
         }
     }
     // Adapted from https://auth0.com/docs/api-auth/tutorials/nonce#generate-a-cryptographically-random-nonce
