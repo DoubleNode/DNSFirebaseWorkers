@@ -55,6 +55,7 @@ public extension DNSAppConstants {
                 static public let loadChangeRequests = "loadChangeRequests"
                 static public let loadTabs = "loadTabs"
                 static public let requestChangeAdmin = "requestChangeAdmin"
+                static public let searchAccount = "searchAccount"
                 static public let updateAccount = "updateAccount"
                 static public let updatePushToken = "updatePushToken"
                 static public let updateUser = "updateUser"
