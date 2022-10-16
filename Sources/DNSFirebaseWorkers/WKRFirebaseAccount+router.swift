@@ -31,6 +31,8 @@ open class WKRFirebaseAccountRouter: NETBlankRouter {
             return apiLoadAccount(userId)
         case .apiLoadAccounts(_, let user):
             return apiLoadAccounts(user)
+        case .apiSearchAccounts(_, let parameters):
+            return apiSearchAccounts(parameters)
         case .apiUpdate(_, let account):
             return apiUpdate(account)
         }
@@ -135,6 +137,29 @@ open class WKRFirebaseAccountRouter: NETBlankRouter {
 
         var components = try! componentsResult.get() // swiftlint:disable:this force_try
         components.path += "/users/\(user.id)/accounts"
+        guard let url = components.url else {
+            let error = DNSError.NetworkBase.invalidUrl(.firebaseWorkers(self))
+            DNSCore.reportError(error)
+            return .failure(error)
+        }
+
+        let requestResult = super.urlRequest(using: url)
+        if case .failure(let error) = requestResult { DNSCore.reportError(error); return .failure(error) }
+
+        var request = try! requestResult.get() // swiftlint:disable:this force_try
+        request.method = .get
+        return .success(request)
+    }
+    open func apiSearchAccounts(_ parameters: DNSDataDictionary) -> NETPTCLRouterResURLRequest {
+        let componentsResult = netConfig.urlComponents()
+        if case .failure(let error) = componentsResult { DNSCore.reportError(error); return .failure(error) }
+
+        var components = try! componentsResult.get() // swiftlint:disable:this force_try
+        components.path += "/accounts/search"
+        components.queryItems = parameters.compactMap({ (key, value) in
+            guard let value = value as? String else { return nil }
+            return URLQueryItem(name: key, value: value)
+        })
         guard let url = components.url else {
             let error = DNSError.NetworkBase.invalidUrl(.firebaseWorkers(self))
             DNSCore.reportError(error)

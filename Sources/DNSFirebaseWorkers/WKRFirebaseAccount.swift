@@ -196,6 +196,44 @@ open class WKRFirebaseAccount: WKRBlankAccount, DecodingConfigurationProviding, 
             block?(.failure(error))
         })
     }
+    override open func intDoSearchAccounts(using parameters: DNSDataDictionary,
+                                           with progress: DNSPTCLProgressBlock?,
+                                           and block: WKRPTCLAccountBlkAAccount?,
+                                           then resultBlock: DNSPTCLResultBlock?) {
+        let callData = WKRPTCLSystemsStateData(system: DNSAppConstants.Systems.accounts,
+                                               endPoint: DNSAppConstants.Systems.Accounts.EndPoints.searchAccount,
+                                               sendDebug: DNSAppConstants.Systems.Accounts.sendDebug)
+
+        guard let dataRequest = try? API.apiSearchAccounts(router: self.netRouter, parameters: parameters)
+            .dataRequest.get() else {
+            let error = DNSError.NetworkBase.dataError(.firebaseWorkers(self))
+            block?(.failure(error)); _ = resultBlock?(.error)
+            return
+        }
+        self.processRequestData(callData, dataRequest, with: resultBlock,
+                                onSuccess: { data in
+            do {
+                let response = try JSONDecoder().decode(Self.config.accountsResponseType, from: data)
+                block?(.success(response.accounts))
+                return .success
+            } catch {
+                DNSCore.reportError(error)
+                return .failure(error)
+            }
+        },
+                                onPendingError: { error, _ in
+            if case DNSError.NetworkBase.expiredAccessToken = error {
+                return error
+            }
+            if case DNSError.NetworkBase.notFound = error {
+                return error
+            }
+            return DNSError.NetworkBase.lowerError(error: error, .firebaseWorkers(self))
+        },
+                                onError: { error, _ in
+            block?(.failure(error))
+        })
+    }
     override open func intDoUpdate(account: DAOAccount,
                                    with progress: DNSPTCLProgressBlock?,
                                    and block: WKRPTCLAccountBlkVoid?,
