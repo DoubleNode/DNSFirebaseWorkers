@@ -222,6 +222,10 @@ open class WKRFirebaseAccount: WKRBlankAccount, DecodingConfigurationProviding, 
             }
         },
                                 onPendingError: { error, _ in
+            if case DNSError.NetworkBase.alreadyLinked = error {
+                let value = Self.xlt.string(from: parameters["accountId"] as Any?) ?? "<blank>"
+                return DNSError.Account.alreadyLinked(value: value, .firebaseWorkers(self))
+            }
             if case DNSError.NetworkBase.expiredAccessToken = error {
                 return error
             }
