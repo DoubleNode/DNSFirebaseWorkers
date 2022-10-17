@@ -222,6 +222,9 @@ open class WKRFirebaseAccount: WKRBlankAccount, DecodingConfigurationProviding, 
             }
         },
                                 onPendingError: { error, _ in
+            if case DNSError.NetworkBase.alreadyLinked = error {
+                return error
+            }
             if case DNSError.NetworkBase.expiredAccessToken = error {
                 return error
             }
