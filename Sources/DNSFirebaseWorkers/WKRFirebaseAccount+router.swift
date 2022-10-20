@@ -27,12 +27,16 @@ open class WKRFirebaseAccountRouter: NETBlankRouter {
             return apiDeactivate(account)
         case .apiDelete(_, let account):
             return apiDelete(account)
+        case .apiLinkAccount(_, let accountId, let userId):
+            return apiLinkAccount(accountId, userId)
         case .apiLoadAccount(_, let userId):
             return apiLoadAccount(userId)
         case .apiLoadAccounts(_, let user):
             return apiLoadAccounts(user)
         case .apiSearchAccounts(_, let parameters):
             return apiSearchAccounts(parameters)
+        case .apiUnlinkAccount(_, let accountId, let userId):
+            return apiUnlinkAccount(accountId, userId)
         case .apiUpdate(_, let account):
             return apiUpdate(account)
         }
@@ -112,6 +116,26 @@ open class WKRFirebaseAccountRouter: NETBlankRouter {
         request.method = .delete
         return .success(request)
     }
+    open func apiLinkAccount(_ account: DAOAccount,
+                             _ user: DAOUser) -> NETPTCLRouterResURLRequest {
+        let componentsResult = netConfig.urlComponents()
+        if case .failure(let error) = componentsResult { DNSCore.reportError(error); return .failure(error) }
+
+        var components = try! componentsResult.get() // swiftlint:disable:this force_try
+        components.path += "/users/\(user.id)/accounts/\(account.id)"
+        guard let url = components.url else {
+            let error = DNSError.NetworkBase.invalidUrl(.firebaseWorkers(self))
+            DNSCore.reportError(error)
+            return .failure(error)
+        }
+
+        let requestResult = super.urlRequest(using: url)
+        if case .failure(let error) = requestResult { DNSCore.reportError(error); return .failure(error) }
+
+        var request = try! requestResult.get() // swiftlint:disable:this force_try
+        request.method = .post
+        return .success(request)
+    }
     open func apiLoadAccount(_ accountId: String) -> NETPTCLRouterResURLRequest {
         let componentsResult = netConfig.urlComponents()
         if case .failure(let error) = componentsResult { DNSCore.reportError(error); return .failure(error) }
@@ -171,6 +195,26 @@ open class WKRFirebaseAccountRouter: NETBlankRouter {
 
         var request = try! requestResult.get() // swiftlint:disable:this force_try
         request.method = .get
+        return .success(request)
+    }
+    open func apiUnlinkAccount(_ account: DAOAccount,
+                               _ user: DAOUser) -> NETPTCLRouterResURLRequest {
+        let componentsResult = netConfig.urlComponents()
+        if case .failure(let error) = componentsResult { DNSCore.reportError(error); return .failure(error) }
+
+        var components = try! componentsResult.get() // swiftlint:disable:this force_try
+        components.path += "/users/\(user.id)/accounts/\(account.id)"
+        guard let url = components.url else {
+            let error = DNSError.NetworkBase.invalidUrl(.firebaseWorkers(self))
+            DNSCore.reportError(error)
+            return .failure(error)
+        }
+
+        let requestResult = super.urlRequest(using: url)
+        if case .failure(let error) = requestResult { DNSCore.reportError(error); return .failure(error) }
+
+        var request = try! requestResult.get() // swiftlint:disable:this force_try
+        request.method = .delete
         return .success(request)
     }
     open func apiUpdate(_ account: DAOAccount) -> NETPTCLRouterResURLRequest {

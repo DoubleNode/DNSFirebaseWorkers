@@ -94,7 +94,10 @@ open class WKRFirebaseAccount: WKRBlankAccount, DecodingConfigurationProviding, 
             return .success
         },
                                 onPendingError: { error, _ in
-            DNSError.NetworkBase.lowerError(error: error, .firebaseWorkers(self))
+            if case DNSError.NetworkBase.expiredAccessToken = error {
+                return error
+            }
+            return DNSError.NetworkBase.lowerError(error: error, .firebaseWorkers(self))
         },
                                 onError: { error, _ in
             block?(.failure(error))
@@ -120,7 +123,40 @@ open class WKRFirebaseAccount: WKRBlankAccount, DecodingConfigurationProviding, 
             return .success
         },
                                 onPendingError: { error, _ in
-            DNSError.NetworkBase.lowerError(error: error, .firebaseWorkers(self))
+            if case DNSError.NetworkBase.expiredAccessToken = error {
+                return error
+            }
+            return DNSError.NetworkBase.lowerError(error: error, .firebaseWorkers(self))
+        },
+                                onError: { error, _ in
+            block?(.failure(error))
+        })
+    }
+    override open func intDoLink(account: DAOAccount,
+                                 to user: DAOUser,
+                                 with progress: DNSPTCLProgressBlock?,
+                                 and block: WKRPTCLAccountBlkVoid?,
+                                 then resultBlock: DNSPTCLResultBlock?) {
+        let callData = WKRPTCLSystemsStateData(system: DNSAppConstants.Systems.accounts,
+                                               endPoint: DNSAppConstants.Systems.Accounts.EndPoints.linkAccount,
+                                               sendDebug: DNSAppConstants.Systems.Accounts.sendDebug)
+
+        guard let dataRequest = try? API.apiLinkAccount(router: self.netRouter, account: account, user: user)
+            .dataRequest.get() else {
+            let error = DNSError.NetworkBase.dataError(.firebaseWorkers(self))
+            block?(.failure(error)); _ = resultBlock?(.error)
+            return
+        }
+        self.processRequestData(callData, dataRequest, with: resultBlock,
+                                onSuccess: { data in
+            block?(.success)
+            return .success
+        },
+                                onPendingError: { error, _ in
+            if case DNSError.NetworkBase.expiredAccessToken = error {
+                return error
+            }
+            return DNSError.NetworkBase.lowerError(error: error, .firebaseWorkers(self))
         },
                                 onError: { error, _ in
             block?(.failure(error))
@@ -230,6 +266,36 @@ open class WKRFirebaseAccount: WKRBlankAccount, DecodingConfigurationProviding, 
                 return error
             }
             if case DNSError.NetworkBase.notFound = error {
+                return error
+            }
+            return DNSError.NetworkBase.lowerError(error: error, .firebaseWorkers(self))
+        },
+                                onError: { error, _ in
+            block?(.failure(error))
+        })
+    }
+    override open func intDoUnlink(account: DAOAccount,
+                                   from user: DAOUser,
+                                   with progress: DNSPTCLProgressBlock?,
+                                   and block: WKRPTCLAccountBlkVoid?,
+                                   then resultBlock: DNSPTCLResultBlock?) {
+        let callData = WKRPTCLSystemsStateData(system: DNSAppConstants.Systems.accounts,
+                                               endPoint: DNSAppConstants.Systems.Accounts.EndPoints.unlinkAccount,
+                                               sendDebug: DNSAppConstants.Systems.Accounts.sendDebug)
+
+        guard let dataRequest = try? API.apiUnlinkAccount(router: self.netRouter, account: account, user: user)
+            .dataRequest.get() else {
+            let error = DNSError.NetworkBase.dataError(.firebaseWorkers(self))
+            block?(.failure(error)); _ = resultBlock?(.error)
+            return
+        }
+        self.processRequestData(callData, dataRequest, with: resultBlock,
+                                onSuccess: { data in
+            block?(.success)
+            return .success
+        },
+                                onPendingError: { error, _ in
+            if case DNSError.NetworkBase.expiredAccessToken = error {
                 return error
             }
             return DNSError.NetworkBase.lowerError(error: error, .firebaseWorkers(self))
