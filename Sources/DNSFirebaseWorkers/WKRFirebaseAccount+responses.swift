@@ -22,3 +22,11 @@ public struct RSPWKRFirebaseAccountAAccount: PTCLRSPWKRFirebaseAccountAAccount {
     // MARK: - Properties -
     public var accounts: [DAOAccount] = []
 }
+
+public protocol PTCLRSPWKRFirebaseAccountAAccountLinkRequest: Codable {
+    var linkRequests: [DAOAccountLinkRequest] { get }
+}
+public struct RSPWKRFirebaseAccountAAccountLinkRequest: PTCLRSPWKRFirebaseAccountAAccountLinkRequest {
+    // MARK: - Properties -
+    public var linkRequests: [DAOAccountLinkRequest] = []
+}

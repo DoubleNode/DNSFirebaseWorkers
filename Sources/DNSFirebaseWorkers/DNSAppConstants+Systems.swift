@@ -45,15 +45,18 @@ public extension DNSAppConstants {
             }
             public enum EndPoints {
                 static public let activate = "activate"
+                static public let approve = "approve"
                 static public let changeAdmin = "changeAdmin"
                 static public let checkAdmin = "checkAdmin"
                 static public let deactivate = "deactivate"
+                static public let decline = "decline"
                 static public let delete = "delete"
                 static public let denyChangeRequest = "denyChangeRequest"
                 static public let linkAccount = "linkAccount"
                 static public let loadAccount = "loadAccount"
                 static public let loadAccounts = "loadAccounts"
                 static public let loadChangeRequests = "loadChangeRequests"
+                static public let loadLinkRequests = "loadLinkRequests"
                 static public let loadTabs = "loadTabs"
                 static public let requestChangeAdmin = "requestChangeAdmin"
                 static public let searchAccount = "searchAccount"
