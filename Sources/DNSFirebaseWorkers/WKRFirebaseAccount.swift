@@ -18,11 +18,14 @@ import KeyedCodable
 public protocol PTCLCFGWKRFirebaseAccount: PTCLCFGDAOAccount {
     var accountsResponseType: any PTCLRSPWKRFirebaseAccountAAccount.Type { get }
     var linkRequestsResponseType: any PTCLRSPWKRFirebaseAccountAAccountLinkRequest.Type { get }
+    var linkRequestType: DAOAccountLinkRequest.Type { get }
+    var userType: DAOUser.Type { get }
 }
 public class CFGWKRFirebaseAccount: PTCLCFGWKRFirebaseAccount {
     public var accountsResponseType: any PTCLRSPWKRFirebaseAccountAAccount.Type = RSPWKRFirebaseAccountAAccount.self
     public var linkRequestsResponseType: any PTCLRSPWKRFirebaseAccountAAccountLinkRequest.Type = RSPWKRFirebaseAccountAAccountLinkRequest.self
     public var accountType: DAOAccount.Type = DAOAccount.self
+    public var linkRequestType: DAOAccountLinkRequest.Type = DAOAccountLinkRequest.self
     public var userType: DAOUser.Type = DAOUser.self
 
     open func accountArray<K>(from container: KeyedDecodingContainer<K>,
@@ -46,6 +49,11 @@ open class WKRFirebaseAccount: WKRBlankAccount, DecodingConfigurationProviding, 
     public static var encodingConfiguration: EncodingConfiguration { Self.config }
 
     typealias API = WKRFirebaseAccountAPI // swiftlint:disable:this type_name
+
+    // MARK: - Class Factory methods -
+    open class func createLinkRequest() -> DAOAccountLinkRequest { config.linkRequestType.init() }
+    open class func createLinkRequest(from object: DAOAccountLinkRequest) -> DAOAccountLinkRequest { config.linkRequestType.init(from: object) }
+    open class func createLinkRequest(from data: DNSDataDictionary) -> DAOAccountLinkRequest? { config.linkRequestType.init(from: data) }
 
     // MARK: - Internal Work Methods
     override open func intDoActivate(account: DAOAccount,
