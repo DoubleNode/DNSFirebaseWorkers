@@ -23,10 +23,17 @@ public struct RSPWKRFirebaseAccountAAccount: PTCLRSPWKRFirebaseAccountAAccount {
     public var accounts: [DAOAccount] = []
 }
 
+public struct PTCLRSPWKRFirebaseAccountLinkRequest: Codable {
+    let account: DAOAccount
+    let approved: Date?
+    let approvedBy: String
+    let requested: Date
+    let user: DAOUser
+}
 public protocol PTCLRSPWKRFirebaseAccountAAccountLinkRequest: Codable {
-    var linkRequests: [DAOAccountLinkRequest] { get }
+    var linkRequests: [PTCLRSPWKRFirebaseAccountLinkRequest] { get }
 }
 public struct RSPWKRFirebaseAccountAAccountLinkRequest: PTCLRSPWKRFirebaseAccountAAccountLinkRequest {
     // MARK: - Properties -
-    public var linkRequests: [DAOAccountLinkRequest] = []
+    public var linkRequests: [PTCLRSPWKRFirebaseAccountLinkRequest] = []
 }
