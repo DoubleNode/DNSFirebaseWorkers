@@ -21,6 +21,11 @@ public protocol PTCLCFGWKRFirebasePlaces: PTCLCFGDAOPlace {
 public class CFGWKRFirebasePlaces: PTCLCFGWKRFirebasePlaces {
     public var placesResponseType: any PTCLRSPWKRFirebasePlacesAPlace.Type = RSPWKRFirebasePlacesAPlace.self
     public var placeType: DAOPlace.Type = DAOPlace.self
+    open func place<K>(from container: KeyedDecodingContainer<K>,
+                       forKey key: KeyedDecodingContainer<K>.Key) -> DAOPlace? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOPlace.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
     open func placeArray<K>(from container: KeyedDecodingContainer<K>,
                             forKey key: KeyedDecodingContainer<K>.Key) -> [DAOPlace] where K: CodingKey {
         do { return try container.decodeIfPresent([DAOPlace].self, forKey: key, configuration: self) ?? [] } catch { }

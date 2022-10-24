@@ -21,6 +21,23 @@ public class CFGWKRFirebaseSystems: PTCLCFGWKRFirebaseSystems {
     public var systemType: DAOSystem.Type = DAOSystem.self
     public var systemEndPointType: DAOSystemEndPoint.Type = DAOSystemEndPoint.self
     public var systemStateType: DAOSystemState.Type = DAOSystemState.self
+
+    open func system<K>(from container: KeyedDecodingContainer<K>,
+                        forKey key: KeyedDecodingContainer<K>.Key) -> DAOSystem? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOSystem.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+    open func systemEndPoint<K>(from container: KeyedDecodingContainer<K>,
+                                forKey key: KeyedDecodingContainer<K>.Key) -> DAOSystemEndPoint? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOSystemEndPoint.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+    open func systemState<K>(from container: KeyedDecodingContainer<K>,
+                             forKey key: KeyedDecodingContainer<K>.Key) -> DAOSystemState? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOSystemState.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
+
     open func systemArray<K>(from container: KeyedDecodingContainer<K>,
                              forKey key: KeyedDecodingContainer<K>.Key) -> [DAOSystem] where K: CodingKey {
         do { return try container.decodeIfPresent([DAOSystem].self, forKey: key, configuration: self) ?? [] } catch { }
@@ -36,7 +53,6 @@ public class CFGWKRFirebaseSystems: PTCLCFGWKRFirebaseSystems {
         do { return try container.decodeIfPresent([DAOSystemState].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
     }
-
 }
 // swiftlint:disable:next type_body_length
 open class WKRFirebaseSystems: WKRBlankSystems, DecodingConfigurationProviding, EncodingConfigurationProviding {

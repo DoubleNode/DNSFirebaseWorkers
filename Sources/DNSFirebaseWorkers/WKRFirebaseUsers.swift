@@ -22,7 +22,11 @@ public protocol PTCLCFGWKRFirebaseUsers: PTCLCFGDAOUser {
 public class CFGWKRFirebaseUsers: PTCLCFGWKRFirebaseUsers {
     public var usersResponseType: any PTCLRSPWKRFirebaseUsersAUser.Type = RSPWKRFirebaseUsersAUser.self
     public var userType: DAOUser.Type = DAOUser.self
-
+    open func user<K>(from container: KeyedDecodingContainer<K>,
+                      forKey key: KeyedDecodingContainer<K>.Key) -> DAOUser? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOUser.self, forKey: key, configuration: self) ?? nil } catch { }
+        return nil
+    }
     open func userArray<K>(from container: KeyedDecodingContainer<K>,
                            forKey key: KeyedDecodingContainer<K>.Key) -> [DAOUser] where K: CodingKey {
         do { return try container.decodeIfPresent([DAOUser].self, forKey: key, configuration: self) ?? [] } catch { }

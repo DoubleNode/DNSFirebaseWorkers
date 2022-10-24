@@ -30,8 +30,7 @@ public class CFGWKRFirebaseAccount: PTCLCFGWKRFirebaseAccount {
 
     open func account<K>(from container: KeyedDecodingContainer<K>,
                          forKey key: KeyedDecodingContainer<K>.Key) -> DAOAccount? where K: CodingKey {
-        do { return try container.decodeIfPresent(self.accountType, forKey: key,
-                                                  configuration: self) ?? nil } catch { }
+        do { return try container.decodeIfPresent(self.accountType, forKey: key, configuration: self) ?? nil } catch { }
         return nil
     }
 
