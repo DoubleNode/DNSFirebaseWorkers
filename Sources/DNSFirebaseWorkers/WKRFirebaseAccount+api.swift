@@ -25,9 +25,11 @@ public enum WKRFirebaseAccountAPI: URLRequestConvertible {
     case apiLoadAccount(router: NETPTCLRouter, accountId: String)
     case apiLoadAccounts(router: NETPTCLRouter, user: DAOUser)
     case apiLoadLinkRequests(router: NETPTCLRouter, user: DAOUser)
+    case apiLoadUnverifiedAccounts(router: NETPTCLRouter, user: DAOUser)
     case apiSearchAccounts(router: NETPTCLRouter, parameters: DNSDataDictionary)
     case apiUnlinkAccount(router: NETPTCLRouter, account: DAOAccount, user: DAOUser)
     case apiUpdate(router: NETPTCLRouter, account: DAOAccount)
+    case apiVerify(router: NETPTCLRouter, account: DAOAccount)
 
     public var dataRequest: NETPTCLRouterResDataRequest {
         .success(AF.request(self))
@@ -43,9 +45,11 @@ public enum WKRFirebaseAccountAPI: URLRequestConvertible {
         if case .apiLoadAccount(let router, _) = self { netRouter = router as? Router }
         if case .apiLoadAccounts(let router, _) = self { netRouter = router as? Router }
         if case .apiLoadLinkRequests(let router, _) = self { netRouter = router as? Router }
+        if case .apiLoadUnverifiedAccounts(let router, _) = self { netRouter = router as? Router }
         if case .apiSearchAccounts(let router, _) = self { netRouter = router as? Router }
         if case .apiUnlinkAccount(let router, _, _) = self { netRouter = router as? Router }
         if case .apiUpdate(let router, _) = self { netRouter = router as? Router }
+        if case .apiVerify(let router, _) = self { netRouter = router as? Router }
         guard let netRouter else {
             let error = DNSError.Account
                 .invalidParameters(parameters: ["netRouter"], .firebaseWorkers(self))

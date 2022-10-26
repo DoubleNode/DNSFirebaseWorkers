@@ -59,12 +59,14 @@ public extension DNSAppConstants {
                 static public let loadChangeRequests = "loadChangeRequests"
                 static public let loadLinkRequests = "loadLinkRequests"
                 static public let loadTabs = "loadTabs"
+                static public let loadUnverifiedAccounts = "loadUnverifiedAccounts"
                 static public let requestChangeAdmin = "requestChangeAdmin"
                 static public let searchAccount = "searchAccount"
                 static public let unlinkAccount = "unlinkAccount"
                 static public let updateAccount = "updateAccount"
                 static public let updatePushToken = "updatePushToken"
                 static public let updateUser = "updateUser"
+                static public let verifyAccount = "verifyAccount"
             }
         }
         public enum Auth {
