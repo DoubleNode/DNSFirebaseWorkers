@@ -131,7 +131,7 @@ open class WKRFirebaseUsersRouter: NETBlankRouter {
         if case .failure(let error) = requestResult { DNSCore.reportError(error); return .failure(error) }
 
         var request = try! requestResult.get() // swiftlint:disable:this force_try
-        request.method = .post
+        request.method = .patch
         do {
             request = try JSONParameterEncoder().encode(user,
                                                         into: request)

@@ -342,7 +342,7 @@ open class WKRFirebaseAccountRouter: NETBlankRouter {
         if case .failure(let error) = componentsResult { DNSCore.reportError(error); return .failure(error) }
 
         var components = try! componentsResult.get() // swiftlint:disable:this force_try
-        components.path += "/accounts/\(account.id)/preference"
+        components.path += "/accounts/\(account.id)"
         guard let url = components.url else {
             let error = DNSError.NetworkBase.invalidUrl(.firebaseWorkers(self))
             DNSCore.reportError(error)
