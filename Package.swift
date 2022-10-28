@@ -28,10 +28,10 @@ let package = Package(
         // Dependencies declare other packages that this package depends on.
         .package(url: "https://github.com/DoubleNodeOpen/AtomicSwift.git", from: "1.2.2"),
         .package(url: "https://github.com/DoubleNode/DNSBlankWorkers.git", from: "1.10.10"),
-        .package(url: "https://github.com/DoubleNode/DNSCore.git", from: "1.10.2"),
+        .package(url: "https://github.com/DoubleNode/DNSCore.git", from: "1.10.3"),
         .package(url: "https://github.com/DoubleNode/DNSCoreThreading.git", from: "1.10.0"),
         .package(url: "https://github.com/DoubleNode/DNSCrashWorkers.git", from: "1.10.6"),
-        .package(url: "https://github.com/DoubleNode/DNSDataObjects.git", from: "1.10.15"),
+        .package(url: "https://github.com/DoubleNode/DNSDataObjects.git", from: "1.10.18"),
         .package(url: "https://github.com/DoubleNode/DNSError.git", from: "1.10.0"),
         .package(url: "https://github.com/DoubleNode/DNSProtocols.git", from: "1.10.18"),
         .package(url: "https://github.com/firebase/firebase-ios-sdk.git", from: "9.6.0"),
