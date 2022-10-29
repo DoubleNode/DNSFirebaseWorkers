@@ -18,12 +18,14 @@ import KeyedCodable
 public protocol PTCLCFGWKRFirebaseAccount: PTCLCFGDAOAccount {
     var accountsResponseType: any PTCLRSPWKRFirebaseAccountAAccount.Type { get }
     var linkRequestsResponseType: any PTCLRSPWKRFirebaseAccountAAccountLinkRequest.Type { get }
+    var placesResponseType: any PTCLRSPWKRFirebaseAccountAPlace.Type { get }
     var linkRequestType: DAOAccountLinkRequest.Type { get }
     var userType: DAOUser.Type { get }
 }
 public class CFGWKRFirebaseAccount: PTCLCFGWKRFirebaseAccount {
     public var accountsResponseType: any PTCLRSPWKRFirebaseAccountAAccount.Type = RSPWKRFirebaseAccountAAccount.self
     public var linkRequestsResponseType: any PTCLRSPWKRFirebaseAccountAAccountLinkRequest.Type = RSPWKRFirebaseAccountAAccountLinkRequest.self
+    public var placesResponseType: any PTCLRSPWKRFirebaseAccountAPlace.Type = RSPWKRFirebaseAccountAPlace.self
     public var accountType: DAOAccount.Type = DAOAccount.self
     public var linkRequestType: DAOAccountLinkRequest.Type = DAOAccountLinkRequest.self
     public var userType: DAOUser.Type = DAOUser.self
@@ -224,10 +226,40 @@ open class WKRFirebaseAccount: WKRBlankAccount, DecodingConfigurationProviding, 
                                  and block: WKRPTCLAccountBlkVoid?,
                                  then resultBlock: DNSPTCLResultBlock?) {
         let callData = WKRPTCLSystemsStateData(system: DNSAppConstants.Systems.accounts,
-                                               endPoint: DNSAppConstants.Systems.Accounts.EndPoints.linkAccount,
+                                               endPoint: DNSAppConstants.Systems.Accounts.EndPoints.linkUser,
                                                sendDebug: DNSAppConstants.Systems.Accounts.sendDebug)
 
-        guard let dataRequest = try? API.apiLinkAccount(router: self.netRouter, account: account, user: user)
+        guard let dataRequest = try? API.apiLinkUser(router: self.netRouter, account: account, user: user)
+            .dataRequest.get() else {
+            let error = DNSError.NetworkBase.dataError(.firebaseWorkers(self))
+            block?(.failure(error)); _ = resultBlock?(.error)
+            return
+        }
+        self.processRequestData(callData, dataRequest, with: resultBlock,
+                                onSuccess: { data in
+            block?(.success)
+            return .success
+        },
+                                onPendingError: { error, _ in
+            if case DNSError.NetworkBase.expiredAccessToken = error {
+                return error
+            }
+            return DNSError.NetworkBase.lowerError(error: error, .firebaseWorkers(self))
+        },
+                                onError: { error, _ in
+            block?(.failure(error))
+        })
+    }
+    override open func intDoLink(account: DAOAccount,
+                                 to place: DAOPlace,
+                                 with progress: DNSPTCLProgressBlock?,
+                                 and block: WKRPTCLAccountBlkVoid?,
+                                 then resultBlock: DNSPTCLResultBlock?) {
+        let callData = WKRPTCLSystemsStateData(system: DNSAppConstants.Systems.accounts,
+                                               endPoint: DNSAppConstants.Systems.Accounts.EndPoints.linkPlace,
+                                               sendDebug: DNSAppConstants.Systems.Accounts.sendDebug)
+
+        guard let dataRequest = try? API.apiLinkPlace(router: self.netRouter, account: account, place: place)
             .dataRequest.get() else {
             let error = DNSError.NetworkBase.dataError(.firebaseWorkers(self))
             block?(.failure(error)); _ = resultBlock?(.error)
@@ -356,6 +388,41 @@ open class WKRFirebaseAccount: WKRBlankAccount, DecodingConfigurationProviding, 
             block?(.failure(error))
         })
     }
+    override open func intDoLoadPlaces(for account: DAOAccount,
+                                       with progress: DNSProtocols.DNSPTCLProgressBlock?,
+                                       and block: WKRPTCLAccountBlkAPlace?,
+                                       then resultBlock: DNSPTCLResultBlock?) {
+        let callData = WKRPTCLSystemsStateData(system: DNSAppConstants.Systems.accounts,
+                                               endPoint: DNSAppConstants.Systems.Accounts.EndPoints.loadPlaces,
+                                               sendDebug: DNSAppConstants.Systems.Accounts.sendDebug)
+
+        guard let dataRequest = try? API.apiLoadPlaces(router: self.netRouter, account: account)
+            .dataRequest.get() else {
+            let error = DNSError.NetworkBase.dataError(.firebaseWorkers(self))
+            block?(.failure(error)); _ = resultBlock?(.error)
+            return
+        }
+        self.processRequestData(callData, dataRequest, with: resultBlock,
+                                onSuccess: { data in
+            do {
+                let response = try JSONDecoder().decode(Self.config.placesResponseType, from: data)
+                block?(.success(response.places))
+                return .success
+            } catch {
+                DNSCore.reportError(error)
+                return .failure(error)
+            }
+        },
+                                onPendingError: { error, _ in
+            if case DNSError.NetworkBase.expiredAccessToken = error {
+                return error
+            }
+            return DNSError.NetworkBase.lowerError(error: error, .firebaseWorkers(self))
+        },
+                                onError: { error, _ in
+            block?(.failure(error))
+        })
+    }
     override open func intDoLoadUnverifiedAccounts(for user: DAOUser,
                                                    with progress: DNSPTCLProgressBlock?,
                                                    and block: WKRPTCLAccountBlkAAccount?,
@@ -439,10 +506,40 @@ open class WKRFirebaseAccount: WKRBlankAccount, DecodingConfigurationProviding, 
                                    and block: WKRPTCLAccountBlkVoid?,
                                    then resultBlock: DNSPTCLResultBlock?) {
         let callData = WKRPTCLSystemsStateData(system: DNSAppConstants.Systems.accounts,
-                                               endPoint: DNSAppConstants.Systems.Accounts.EndPoints.unlinkAccount,
+                                               endPoint: DNSAppConstants.Systems.Accounts.EndPoints.unlinkUser,
                                                sendDebug: DNSAppConstants.Systems.Accounts.sendDebug)
 
-        guard let dataRequest = try? API.apiUnlinkAccount(router: self.netRouter, account: account, user: user)
+        guard let dataRequest = try? API.apiUnlinkUser(router: self.netRouter, account: account, user: user)
+            .dataRequest.get() else {
+            let error = DNSError.NetworkBase.dataError(.firebaseWorkers(self))
+            block?(.failure(error)); _ = resultBlock?(.error)
+            return
+        }
+        self.processRequestData(callData, dataRequest, with: resultBlock,
+                                onSuccess: { data in
+            block?(.success)
+            return .success
+        },
+                                onPendingError: { error, _ in
+            if case DNSError.NetworkBase.expiredAccessToken = error {
+                return error
+            }
+            return DNSError.NetworkBase.lowerError(error: error, .firebaseWorkers(self))
+        },
+                                onError: { error, _ in
+            block?(.failure(error))
+        })
+    }
+    override open func intDoUnlink(account: DAOAccount,
+                                   from place: DAOPlace,
+                                   with progress: DNSPTCLProgressBlock?,
+                                   and block: WKRPTCLAccountBlkVoid?,
+                                   then resultBlock: DNSPTCLResultBlock?) {
+        let callData = WKRPTCLSystemsStateData(system: DNSAppConstants.Systems.accounts,
+                                               endPoint: DNSAppConstants.Systems.Accounts.EndPoints.unlinkPlace,
+                                               sendDebug: DNSAppConstants.Systems.Accounts.sendDebug)
+
+        guard let dataRequest = try? API.apiUnlinkPlace(router: self.netRouter, account: account, place: place)
             .dataRequest.get() else {
             let error = DNSError.NetworkBase.dataError(.firebaseWorkers(self))
             block?(.failure(error)); _ = resultBlock?(.error)

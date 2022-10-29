@@ -21,13 +21,16 @@ public enum WKRFirebaseAccountAPI: URLRequestConvertible {
     case apiDeactivate(router: NETPTCLRouter, account: DAOAccount)
     case apiDecline(router: NETPTCLRouter, linkRequest: DAOAccountLinkRequest)
     case apiDelete(router: NETPTCLRouter, account: DAOAccount)
-    case apiLinkAccount(router: NETPTCLRouter, account: DAOAccount, user: DAOUser)
+    case apiLinkPlace(router: NETPTCLRouter, account: DAOAccount, place: DAOPlace)
+    case apiLinkUser(router: NETPTCLRouter, account: DAOAccount, user: DAOUser)
     case apiLoadAccount(router: NETPTCLRouter, accountId: String)
     case apiLoadAccounts(router: NETPTCLRouter, user: DAOUser)
     case apiLoadLinkRequests(router: NETPTCLRouter, user: DAOUser)
+    case apiLoadPlaces(router: NETPTCLRouter, account: DAOAccount)
     case apiLoadUnverifiedAccounts(router: NETPTCLRouter, user: DAOUser)
     case apiSearchAccounts(router: NETPTCLRouter, parameters: DNSDataDictionary)
-    case apiUnlinkAccount(router: NETPTCLRouter, account: DAOAccount, user: DAOUser)
+    case apiUnlinkPlace(router: NETPTCLRouter, account: DAOAccount, place: DAOPlace)
+    case apiUnlinkUser(router: NETPTCLRouter, account: DAOAccount, user: DAOUser)
     case apiUpdate(router: NETPTCLRouter, account: DAOAccount)
     case apiVerify(router: NETPTCLRouter, account: DAOAccount)
 
@@ -41,13 +44,16 @@ public enum WKRFirebaseAccountAPI: URLRequestConvertible {
         if case .apiDeactivate(let router, _) = self { netRouter = router as? Router }
         if case .apiDecline(let router, _) = self { netRouter = router as? Router }
         if case .apiDelete(let router, _) = self { netRouter = router as? Router }
-        if case .apiLinkAccount(let router, _, _) = self { netRouter = router as? Router }
+        if case .apiLinkPlace(let router, _, _) = self { netRouter = router as? Router }
+        if case .apiLinkUser(let router, _, _) = self { netRouter = router as? Router }
         if case .apiLoadAccount(let router, _) = self { netRouter = router as? Router }
         if case .apiLoadAccounts(let router, _) = self { netRouter = router as? Router }
         if case .apiLoadLinkRequests(let router, _) = self { netRouter = router as? Router }
+        if case .apiLoadPlaces(let router, _) = self { netRouter = router as? Router }
         if case .apiLoadUnverifiedAccounts(let router, _) = self { netRouter = router as? Router }
         if case .apiSearchAccounts(let router, _) = self { netRouter = router as? Router }
-        if case .apiUnlinkAccount(let router, _, _) = self { netRouter = router as? Router }
+        if case .apiUnlinkPlace(let router, _, _) = self { netRouter = router as? Router }
+        if case .apiUnlinkUser(let router, _, _) = self { netRouter = router as? Router }
         if case .apiUpdate(let router, _) = self { netRouter = router as? Router }
         if case .apiVerify(let router, _) = self { netRouter = router as? Router }
         guard let netRouter else {

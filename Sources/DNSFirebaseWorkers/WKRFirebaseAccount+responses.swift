@@ -30,3 +30,11 @@ public struct RSPWKRFirebaseAccountAAccountLinkRequest: PTCLRSPWKRFirebaseAccoun
     // MARK: - Properties -
     public var linkRequests: [DAOAccountLinkRequest] = []
 }
+
+public protocol PTCLRSPWKRFirebaseAccountAPlace: Codable {
+    var places: [DAOPlace] { get }
+}
+public struct RSPWKRFirebaseAccountAPlace: PTCLRSPWKRFirebaseAccountAPlace {
+    // MARK: - Properties -
+    public var places: [DAOPlace] = []
+}
