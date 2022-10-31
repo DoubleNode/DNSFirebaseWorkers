@@ -382,6 +382,9 @@ open class WKRFirebaseAccount: WKRBlankAccount, DecodingConfigurationProviding, 
             if case DNSError.NetworkBase.expiredAccessToken = error {
                 return error
             }
+            if case DNSError.NetworkBase.notFound = error {
+                return error
+            }
             return DNSError.NetworkBase.lowerError(error: error, .firebaseWorkers(self))
         },
                                 onError: { error, _ in
@@ -417,6 +420,9 @@ open class WKRFirebaseAccount: WKRBlankAccount, DecodingConfigurationProviding, 
             if case DNSError.NetworkBase.expiredAccessToken = error {
                 return error
             }
+            if case DNSError.NetworkBase.notFound = error {
+                return error
+            }
             return DNSError.NetworkBase.lowerError(error: error, .firebaseWorkers(self))
         },
                                 onError: { error, _ in
@@ -450,6 +456,9 @@ open class WKRFirebaseAccount: WKRBlankAccount, DecodingConfigurationProviding, 
         },
                                 onPendingError: { error, _ in
             if case DNSError.NetworkBase.expiredAccessToken = error {
+                return error
+            }
+            if case DNSError.NetworkBase.notFound = error {
                 return error
             }
             return DNSError.NetworkBase.lowerError(error: error, .firebaseWorkers(self))
