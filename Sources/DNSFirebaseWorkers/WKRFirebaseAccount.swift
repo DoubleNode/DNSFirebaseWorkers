@@ -467,6 +467,36 @@ open class WKRFirebaseAccount: WKRBlankAccount, DecodingConfigurationProviding, 
             block?(.failure(error))
         })
     }
+    override open func intDoRename(accountId: String,
+                                   to newAccountId: String,
+                                   with progress: DNSPTCLProgressBlock?,
+                                   and block: WKRPTCLAccountBlkVoid?,
+                                   then resultBlock: DNSPTCLResultBlock?) {
+        let callData = WKRPTCLSystemsStateData(system: DNSAppConstants.Systems.accounts,
+                                               endPoint: DNSAppConstants.Systems.Accounts.EndPoints.updateAccount,
+                                               sendDebug: DNSAppConstants.Systems.Accounts.sendDebug)
+
+        guard let dataRequest = try? API.apiRenameId(router: self.netRouter, accountId: accountId, newAccountId: newAccountId)
+            .dataRequest.get() else {
+            let error = DNSError.NetworkBase.dataError(.firebaseWorkers(self))
+            block?(.failure(error)); _ = resultBlock?(.error)
+            return
+        }
+        self.processRequestJSON(callData, dataRequest, with: resultBlock,
+                                onSuccess: { _ in
+            block?(.success)
+            return .success
+        },
+                                onPendingError: { error, _ in
+            if case DNSError.NetworkBase.expiredAccessToken = error {
+                return error
+            }
+            return DNSError.NetworkBase.lowerError(error: error, .firebaseWorkers(self))
+        },
+                                onError: { error, _ in
+            block?(.failure(error))
+        })
+    }
     override open func intDoSearchAccounts(using parameters: DNSDataDictionary,
                                            with progress: DNSPTCLProgressBlock?,
                                            and block: WKRPTCLAccountBlkAAccount?,

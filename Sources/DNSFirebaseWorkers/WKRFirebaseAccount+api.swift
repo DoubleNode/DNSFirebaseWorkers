@@ -28,6 +28,7 @@ public enum WKRFirebaseAccountAPI: URLRequestConvertible {
     case apiLoadLinkRequests(router: NETPTCLRouter, user: DAOUser)
     case apiLoadPlaces(router: NETPTCLRouter, account: DAOAccount)
     case apiLoadUnverifiedAccounts(router: NETPTCLRouter, user: DAOUser)
+    case apiRenameId(router: NETPTCLRouter, accountId: String, newAccountId: String)
     case apiSearchAccounts(router: NETPTCLRouter, parameters: DNSDataDictionary)
     case apiUnlinkPlace(router: NETPTCLRouter, account: DAOAccount, place: DAOPlace)
     case apiUnlinkUser(router: NETPTCLRouter, account: DAOAccount, user: DAOUser)
@@ -51,6 +52,7 @@ public enum WKRFirebaseAccountAPI: URLRequestConvertible {
         if case .apiLoadLinkRequests(let router, _) = self { netRouter = router as? Router }
         if case .apiLoadPlaces(let router, _) = self { netRouter = router as? Router }
         if case .apiLoadUnverifiedAccounts(let router, _) = self { netRouter = router as? Router }
+        if case .apiRenameId(let router, _, _) = self { netRouter = router as? Router }
         if case .apiSearchAccounts(let router, _) = self { netRouter = router as? Router }
         if case .apiUnlinkPlace(let router, _, _) = self { netRouter = router as? Router }
         if case .apiUnlinkUser(let router, _, _) = self { netRouter = router as? Router }

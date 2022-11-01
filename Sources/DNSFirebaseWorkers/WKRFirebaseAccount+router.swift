@@ -45,6 +45,8 @@ open class WKRFirebaseAccountRouter: NETBlankRouter {
             return apiLoadPlaces(account)
         case .apiLoadUnverifiedAccounts(_, let user):
             return apiLoadUnverifiedAccounts(user)
+        case .apiRenameId(_, let accountId, let newAccountId):
+            return apiRenameId(accountId, newAccountId)
         case .apiSearchAccounts(_, let parameters):
             return apiSearchAccounts(parameters)
         case .apiUnlinkPlace(_, let account, let place):
@@ -337,6 +339,25 @@ open class WKRFirebaseAccountRouter: NETBlankRouter {
 
         var request = try! requestResult.get() // swiftlint:disable:this force_try
         request.method = .get
+        return .success(request)
+    }
+    open func apiRenameId(_ accountId: String, _ newAccountId: String) -> NETPTCLRouterResURLRequest {
+        let componentsResult = netConfig.urlComponents()
+        if case .failure(let error) = componentsResult { DNSCore.reportError(error); return .failure(error) }
+
+        var components = try! componentsResult.get() // swiftlint:disable:this force_try
+        components.path += "/accounts/\(accountId)/rename/\(newAccountId)"
+        guard let url = components.url else {
+            let error = DNSError.NetworkBase.invalidUrl(.firebaseWorkers(self))
+            DNSCore.reportError(error)
+            return .failure(error)
+        }
+
+        let requestResult = super.urlRequest(using: url)
+        if case .failure(let error) = requestResult { DNSCore.reportError(error); return .failure(error) }
+
+        var request = try! requestResult.get() // swiftlint:disable:this force_try
+        request.method = .put
         return .success(request)
     }
     open func apiSearchAccounts(_ parameters: DNSDataDictionary) -> NETPTCLRouterResURLRequest {
