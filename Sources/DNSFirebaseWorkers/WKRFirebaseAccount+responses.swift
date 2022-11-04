@@ -38,3 +38,11 @@ public struct RSPWKRFirebaseAccountAPlace: PTCLRSPWKRFirebaseAccountAPlace {
     // MARK: - Properties -
     public var places: [DAOPlace] = []
 }
+
+public protocol PTCLRSPWKRFirebaseAccountAUser: Codable {
+    var users: [DAOUser] { get }
+}
+public struct RSPWKRFirebaseAccountAUser: PTCLRSPWKRFirebaseAccountAUser {
+    // MARK: - Properties -
+    public var users: [DAOUser] = []
+}

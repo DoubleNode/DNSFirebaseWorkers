@@ -19,6 +19,7 @@ public protocol PTCLCFGWKRFirebaseAccount: PTCLCFGDAOAccount {
     var accountsResponseType: any PTCLRSPWKRFirebaseAccountAAccount.Type { get }
     var linkRequestsResponseType: any PTCLRSPWKRFirebaseAccountAAccountLinkRequest.Type { get }
     var placesResponseType: any PTCLRSPWKRFirebaseAccountAPlace.Type { get }
+    var usersResponseType: any PTCLRSPWKRFirebaseAccountAUser.Type { get }
     var linkRequestType: DAOAccountLinkRequest.Type { get }
     var userType: DAOUser.Type { get }
 }
@@ -26,6 +27,7 @@ public class CFGWKRFirebaseAccount: PTCLCFGWKRFirebaseAccount {
     public var accountsResponseType: any PTCLRSPWKRFirebaseAccountAAccount.Type = RSPWKRFirebaseAccountAAccount.self
     public var linkRequestsResponseType: any PTCLRSPWKRFirebaseAccountAAccountLinkRequest.Type = RSPWKRFirebaseAccountAAccountLinkRequest.self
     public var placesResponseType: any PTCLRSPWKRFirebaseAccountAPlace.Type = RSPWKRFirebaseAccountAPlace.self
+    public var usersResponseType: any PTCLRSPWKRFirebaseAccountAUser.Type = RSPWKRFirebaseAccountAUser.self
     public var accountType: DAOAccount.Type = DAOAccount.self
     public var linkRequestType: DAOAccountLinkRequest.Type = DAOAccountLinkRequest.self
     public var userType: DAOUser.Type = DAOUser.self
@@ -372,6 +374,44 @@ open class WKRFirebaseAccount: WKRBlankAccount, DecodingConfigurationProviding, 
             do {
                 let response = try JSONDecoder().decode(Self.config.linkRequestsResponseType, from: data)
                 block?(.success(response.linkRequests))
+                return .success
+            } catch {
+                DNSCore.reportError(error)
+                return .failure(error)
+            }
+        },
+                                onPendingError: { error, _ in
+            if case DNSError.NetworkBase.expiredAccessToken = error {
+                return error
+            }
+            if case DNSError.NetworkBase.notFound = error {
+                return error
+            }
+            return DNSError.NetworkBase.lowerError(error: error, .firebaseWorkers(self))
+        },
+                                onError: { error, _ in
+            block?(.failure(error))
+        })
+    }
+    override open func intDoLoadPendingUsers(for user: DAOUser,
+                                             with progress: DNSPTCLProgressBlock?,
+                                             and block: WKRPTCLAccountBlkAUser?,
+                                             then resultBlock: DNSPTCLResultBlock?) {
+        let callData = WKRPTCLSystemsStateData(system: DNSAppConstants.Systems.accounts,
+                                               endPoint: DNSAppConstants.Systems.Accounts.EndPoints.loadPlaces,
+                                               sendDebug: DNSAppConstants.Systems.Accounts.sendDebug)
+
+        guard let dataRequest = try? API.apiLoadPendingUsers(router: self.netRouter, user: user)
+            .dataRequest.get() else {
+            let error = DNSError.NetworkBase.dataError(.firebaseWorkers(self))
+            block?(.failure(error)); _ = resultBlock?(.error)
+            return
+        }
+        self.processRequestData(callData, dataRequest, with: resultBlock,
+                                onSuccess: { data in
+            do {
+                let response = try JSONDecoder().decode(Self.config.usersResponseType, from: data)
+                block?(.success(response.users))
                 return .success
             } catch {
                 DNSCore.reportError(error)
