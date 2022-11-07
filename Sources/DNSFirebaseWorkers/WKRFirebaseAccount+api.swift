@@ -18,6 +18,7 @@ public enum WKRFirebaseAccountAPI: URLRequestConvertible {
     typealias Router = WKRFirebaseAccountRouter
     case apiActivate(router: NETPTCLRouter, account: DAOAccount)
     case apiApprove(router: NETPTCLRouter, linkRequest: DAOAccountLinkRequest)
+    case apiConfirm(router: NETPTCLRouter, pendingUser: DAOUser)
     case apiDeactivate(router: NETPTCLRouter, account: DAOAccount)
     case apiDecline(router: NETPTCLRouter, linkRequest: DAOAccountLinkRequest)
     case apiDelete(router: NETPTCLRouter, account: DAOAccount)
@@ -43,6 +44,7 @@ public enum WKRFirebaseAccountAPI: URLRequestConvertible {
         var netRouter: Router?
         if case .apiActivate(let router, _) = self { netRouter = router as? Router }
         if case .apiApprove(let router, _) = self { netRouter = router as? Router }
+        if case .apiConfirm(let router, _) = self { netRouter = router as? Router }
         if case .apiDeactivate(let router, _) = self { netRouter = router as? Router }
         if case .apiDecline(let router, _) = self { netRouter = router as? Router }
         if case .apiDelete(let router, _) = self { netRouter = router as? Router }

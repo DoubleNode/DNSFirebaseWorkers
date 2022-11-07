@@ -49,6 +49,7 @@ public extension DNSAppConstants {
                 static public let approve = "approve"
                 static public let changeAdmin = "changeAdmin"
                 static public let checkAdmin = "checkAdmin"
+                static public let confirm = "confirm"
                 static public let deactivate = "deactivate"
                 static public let decline = "decline"
                 static public let delete = "delete"
