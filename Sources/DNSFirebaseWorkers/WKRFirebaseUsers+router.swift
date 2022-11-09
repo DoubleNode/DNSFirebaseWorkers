@@ -23,6 +23,18 @@ open class WKRFirebaseUsersRouter: NETBlankRouter {
         switch api {
         case .apiActivate(_, let user):
             return apiActivate(user)
+        case .apiConfirm(_, let pendingUser):
+            return apiConfirm(pendingUser)
+        case .apiConsent(_, let childUser):
+            return apiConsent(childUser)
+        case .apiLoadChildUsers(_, let user):
+            return apiLoadChildUsers(user)
+        case .apiLoadLinkRequests(_, let user):
+            return apiLoadLinkRequests(user)
+        case .apiLoadPendingUsers(_, let user):
+            return apiLoadPendingUsers(user)
+        case .apiLoadUnverifiedAccounts(_, let user):
+            return apiLoadUnverifiedAccounts(user)
         case .apiLoadUser(_, let userId):
             return apiLoadUser(userId)
         case .apiLoadUsers(_, let account):
@@ -56,6 +68,132 @@ open class WKRFirebaseUsersRouter: NETBlankRouter {
 
         var request = try! requestResult.get() // swiftlint:disable:this force_try
         request.method = .post
+        return .success(request)
+    }
+    open func apiConfirm(_ pendingUser: DAOUser) -> NETPTCLRouterResURLRequest {
+        let parameters = [
+            "deviceId": DNSAppConstants.uniqueDeviceId,
+        ]
+        let componentsResult = netConfig.urlComponents()
+        if case .failure(let error) = componentsResult { DNSCore.reportError(error); return .failure(error) }
+
+        var components = try! componentsResult.get() // swiftlint:disable:this force_try
+        components.path += "/users/\(pendingUser.id)/confirm"
+        components.queryItems = parameters.map({ (key, value) -> URLQueryItem in
+            URLQueryItem(name: key, value: String(value))
+        })
+        guard let url = components.url else {
+            let error = DNSError.NetworkBase.invalidUrl(.firebaseWorkers(self))
+            DNSCore.reportError(error)
+            return .failure(error)
+        }
+
+        let requestResult = super.urlRequest(using: url)
+        if case .failure(let error) = requestResult { DNSCore.reportError(error); return .failure(error) }
+
+        var request = try! requestResult.get() // swiftlint:disable:this force_try
+        request.method = .post
+        return .success(request)
+    }
+    open func apiConsent(_ childUser: DAOUser) -> NETPTCLRouterResURLRequest {
+        let parameters = [
+            "deviceId": DNSAppConstants.uniqueDeviceId,
+        ]
+        let componentsResult = netConfig.urlComponents()
+        if case .failure(let error) = componentsResult { DNSCore.reportError(error); return .failure(error) }
+
+        var components = try! componentsResult.get() // swiftlint:disable:this force_try
+        components.path += "/users/\(childUser.id)/consent"
+        components.queryItems = parameters.map({ (key, value) -> URLQueryItem in
+            URLQueryItem(name: key, value: String(value))
+        })
+        guard let url = components.url else {
+            let error = DNSError.NetworkBase.invalidUrl(.firebaseWorkers(self))
+            DNSCore.reportError(error)
+            return .failure(error)
+        }
+
+        let requestResult = super.urlRequest(using: url)
+        if case .failure(let error) = requestResult { DNSCore.reportError(error); return .failure(error) }
+
+        var request = try! requestResult.get() // swiftlint:disable:this force_try
+        request.method = .post
+        return .success(request)
+    }
+    open func apiLoadLinkRequests(_ user: DAOUser) -> NETPTCLRouterResURLRequest {
+        let componentsResult = netConfig.urlComponents()
+        if case .failure(let error) = componentsResult { DNSCore.reportError(error); return .failure(error) }
+
+        var components = try! componentsResult.get() // swiftlint:disable:this force_try
+        components.path += "/users/\(user.id)/accounts/linkRequests"
+        guard let url = components.url else {
+            let error = DNSError.NetworkBase.invalidUrl(.firebaseWorkers(self))
+            DNSCore.reportError(error)
+            return .failure(error)
+        }
+
+        let requestResult = super.urlRequest(using: url)
+        if case .failure(let error) = requestResult { DNSCore.reportError(error); return .failure(error) }
+
+        var request = try! requestResult.get() // swiftlint:disable:this force_try
+        request.method = .get
+        return .success(request)
+    }
+    open func apiLoadChildUsers(_ user: DAOUser) -> NETPTCLRouterResURLRequest {
+        let componentsResult = netConfig.urlComponents()
+        if case .failure(let error) = componentsResult { DNSCore.reportError(error); return .failure(error) }
+
+        var components = try! componentsResult.get() // swiftlint:disable:this force_try
+        components.path += "/users/\(user.id)/users/consent"
+        guard let url = components.url else {
+            let error = DNSError.NetworkBase.invalidUrl(.firebaseWorkers(self))
+            DNSCore.reportError(error)
+            return .failure(error)
+        }
+
+        let requestResult = super.urlRequest(using: url)
+        if case .failure(let error) = requestResult { DNSCore.reportError(error); return .failure(error) }
+
+        var request = try! requestResult.get() // swiftlint:disable:this force_try
+        request.method = .get
+        return .success(request)
+    }
+    open func apiLoadPendingUsers(_ user: DAOUser) -> NETPTCLRouterResURLRequest {
+        let componentsResult = netConfig.urlComponents()
+        if case .failure(let error) = componentsResult { DNSCore.reportError(error); return .failure(error) }
+
+        var components = try! componentsResult.get() // swiftlint:disable:this force_try
+        components.path += "/users/\(user.id)/users/pending"
+        guard let url = components.url else {
+            let error = DNSError.NetworkBase.invalidUrl(.firebaseWorkers(self))
+            DNSCore.reportError(error)
+            return .failure(error)
+        }
+
+        let requestResult = super.urlRequest(using: url)
+        if case .failure(let error) = requestResult { DNSCore.reportError(error); return .failure(error) }
+
+        var request = try! requestResult.get() // swiftlint:disable:this force_try
+        request.method = .get
+        return .success(request)
+    }
+    open func apiLoadUnverifiedAccounts(_ user: DAOUser) -> NETPTCLRouterResURLRequest {
+        let componentsResult = netConfig.urlComponents()
+        if case .failure(let error) = componentsResult { DNSCore.reportError(error); return .failure(error) }
+
+        var components = try! componentsResult.get() // swiftlint:disable:this force_try
+        components.path += "/users/\(user.id)/accounts/unverified"
+        guard let url = components.url else {
+            let error = DNSError.NetworkBase.invalidUrl(.firebaseWorkers(self))
+            DNSCore.reportError(error)
+            return .failure(error)
+        }
+
+        let requestResult = super.urlRequest(using: url)
+        if case .failure(let error) = requestResult { DNSCore.reportError(error); return .failure(error) }
+
+        var request = try! requestResult.get() // swiftlint:disable:this force_try
+        request.method = .get
         return .success(request)
     }
     open func apiLoadUser(_ userId: String) -> NETPTCLRouterResURLRequest {

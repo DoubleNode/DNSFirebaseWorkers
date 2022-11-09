@@ -18,7 +18,6 @@ public enum WKRFirebaseAccountAPI: URLRequestConvertible {
     typealias Router = WKRFirebaseAccountRouter
     case apiActivate(router: NETPTCLRouter, account: DAOAccount)
     case apiApprove(router: NETPTCLRouter, linkRequest: DAOAccountLinkRequest)
-    case apiConfirm(router: NETPTCLRouter, pendingUser: DAOUser)
     case apiDeactivate(router: NETPTCLRouter, account: DAOAccount)
     case apiDecline(router: NETPTCLRouter, linkRequest: DAOAccountLinkRequest)
     case apiDelete(router: NETPTCLRouter, account: DAOAccount)
@@ -26,10 +25,7 @@ public enum WKRFirebaseAccountAPI: URLRequestConvertible {
     case apiLinkUser(router: NETPTCLRouter, account: DAOAccount, user: DAOUser)
     case apiLoadAccount(router: NETPTCLRouter, accountId: String)
     case apiLoadAccounts(router: NETPTCLRouter, user: DAOUser)
-    case apiLoadLinkRequests(router: NETPTCLRouter, user: DAOUser)
-    case apiLoadPendingUsers(router: NETPTCLRouter, user: DAOUser)
     case apiLoadPlaces(router: NETPTCLRouter, account: DAOAccount)
-    case apiLoadUnverifiedAccounts(router: NETPTCLRouter, user: DAOUser)
     case apiRenameId(router: NETPTCLRouter, accountId: String, newAccountId: String)
     case apiSearchAccounts(router: NETPTCLRouter, parameters: DNSDataDictionary)
     case apiUnlinkPlace(router: NETPTCLRouter, account: DAOAccount, place: DAOPlace)
@@ -44,7 +40,6 @@ public enum WKRFirebaseAccountAPI: URLRequestConvertible {
         var netRouter: Router?
         if case .apiActivate(let router, _) = self { netRouter = router as? Router }
         if case .apiApprove(let router, _) = self { netRouter = router as? Router }
-        if case .apiConfirm(let router, _) = self { netRouter = router as? Router }
         if case .apiDeactivate(let router, _) = self { netRouter = router as? Router }
         if case .apiDecline(let router, _) = self { netRouter = router as? Router }
         if case .apiDelete(let router, _) = self { netRouter = router as? Router }
@@ -52,10 +47,7 @@ public enum WKRFirebaseAccountAPI: URLRequestConvertible {
         if case .apiLinkUser(let router, _, _) = self { netRouter = router as? Router }
         if case .apiLoadAccount(let router, _) = self { netRouter = router as? Router }
         if case .apiLoadAccounts(let router, _) = self { netRouter = router as? Router }
-        if case .apiLoadLinkRequests(let router, _) = self { netRouter = router as? Router }
-        if case .apiLoadPendingUsers(let router, _) = self { netRouter = router as? Router }
         if case .apiLoadPlaces(let router, _) = self { netRouter = router as? Router }
-        if case .apiLoadUnverifiedAccounts(let router, _) = self { netRouter = router as? Router }
         if case .apiRenameId(let router, _, _) = self { netRouter = router as? Router }
         if case .apiSearchAccounts(let router, _) = self { netRouter = router as? Router }
         if case .apiUnlinkPlace(let router, _, _) = self { netRouter = router as? Router }

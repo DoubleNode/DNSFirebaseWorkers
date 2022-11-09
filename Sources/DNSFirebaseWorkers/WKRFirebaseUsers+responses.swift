@@ -19,27 +19,21 @@ public protocol PTCLRSPWKRFirebaseUsersAUser: Codable {  // , CodableWithConfigu
     var users: [DAOUser] { get }
 }
 public struct RSPWKRFirebaseUsersAUser: PTCLRSPWKRFirebaseUsersAUser { // , DecodingConfigurationProviding, EncodingConfigurationProviding {
-//    static let xlt = DNSDataTranslation()
-//    public typealias Config = PTCLCFGWKRFirebaseUser
-//    public typealias DecodingConfiguration = Config
-//    public typealias EncodingConfiguration = Config
-
-    // MARK: - Properties -
-//    public enum CodingKeys: String, CodingKey {
-//        case users
-//    }
-
-//    @CodableConfiguration(from: WKRFirebaseUsers.self)
     public var users: [DAOUser] = []
+}
 
-//    public init(from decoder: Decoder) throws {
-//        let container = try decoder.container(keyedBy: CodingKeys.self)
-//        users = Self.xlt.daoUserArray(with: WKRFirebaseUsers.decodingConfiguration,
-//                                      from: container, forKey: .users)
-//    }
-//
-//    public func encode(to encoder: Encoder) throws {
-//        var container = encoder.container(keyedBy: CodingKeys.self)
-//        try container.encode(users, forKey: .users)
-//    }
+public protocol PTCLRSPWKRFirebaseUsersAAccount: Codable {
+    var accounts: [DAOAccount] { get }
+}
+public struct RSPWKRFirebaseUsersAAccount: PTCLRSPWKRFirebaseUsersAAccount {
+    // MARK: - Properties -
+    public var accounts: [DAOAccount] = []
+}
+
+public protocol PTCLRSPWKRFirebaseUsersAAccountLinkRequest: Codable {
+    var linkRequests: [DAOAccountLinkRequest] { get }
+}
+public struct RSPWKRFirebaseUsersAAccountLinkRequest: PTCLRSPWKRFirebaseUsersAAccountLinkRequest {
+    // MARK: - Properties -
+    public var linkRequests: [DAOAccountLinkRequest] = []
 }
