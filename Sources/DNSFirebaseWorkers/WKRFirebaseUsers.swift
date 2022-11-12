@@ -192,6 +192,7 @@ open class WKRFirebaseUsers: WKRBlankUsers {
         })
     }
     override open func intDoLoadLinkRequests(for user: DAOUser,
+                                             using parameters: DNSDataDictionary,
                                              with progress: DNSProtocols.DNSPTCLProgressBlock?,
                                              and block: WKRPTCLUsersBlkAAccountLinkRequest?,
                                              then resultBlock: DNSPTCLResultBlock?) {
@@ -199,7 +200,7 @@ open class WKRFirebaseUsers: WKRBlankUsers {
                                                endPoint: DNSAppConstants.Systems.Users.EndPoints.loadLinkRequests,
                                                sendDebug: DNSAppConstants.Systems.Users.sendDebug)
 
-        guard let dataRequest = try? API.apiLoadLinkRequests(router: self.netRouter, user: user)
+        guard let dataRequest = try? API.apiLoadLinkRequests(router: self.netRouter, parameters: parameters, user: user)
             .dataRequest.get() else {
             let error = DNSError.NetworkBase.dataError(.firebaseWorkers(self))
             block?(.failure(error)); _ = resultBlock?(.error)

@@ -20,7 +20,7 @@ public enum WKRFirebaseUsersAPI: URLRequestConvertible {
     case apiConfirm(router: NETPTCLRouter, pendingUser: DAOUser)
     case apiConsent(router: NETPTCLRouter, childUser: DAOUser)
     case apiLoadChildUsers(router: NETPTCLRouter, user: DAOUser)
-    case apiLoadLinkRequests(router: NETPTCLRouter, user: DAOUser)
+    case apiLoadLinkRequests(router: NETPTCLRouter, parameters: DNSDataDictionary, user: DAOUser)
     case apiLoadPendingUsers(router: NETPTCLRouter, user: DAOUser)
     case apiLoadUnverifiedAccounts(router: NETPTCLRouter, user: DAOUser)
     case apiLoadUser(router: NETPTCLRouter, userId: String)
@@ -37,7 +37,7 @@ public enum WKRFirebaseUsersAPI: URLRequestConvertible {
         if case .apiConfirm(let router, _) = self { netRouter = router as? Router }
         if case .apiConsent(let router, _) = self { netRouter = router as? Router }
         if case .apiLoadChildUsers(let router, _) = self { netRouter = router as? Router }
-        if case .apiLoadLinkRequests(let router, _) = self { netRouter = router as? Router }
+        if case .apiLoadLinkRequests(let router, _, _) = self { netRouter = router as? Router }
         if case .apiLoadPendingUsers(let router, _) = self { netRouter = router as? Router }
         if case .apiLoadUnverifiedAccounts(let router, _) = self { netRouter = router as? Router }
         if case .apiLoadUser(let router, _) = self { netRouter = router as? Router }

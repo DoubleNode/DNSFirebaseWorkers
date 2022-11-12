@@ -15,6 +15,7 @@ import DNSProtocols
 import Foundation
 
 open class WKRFirebaseUsersRouter: NETBlankRouter {
+    static let xlt = DNSDataTranslation()
     public typealias API = WKRFirebaseUsersAPI // swiftlint:disable:this type_name
     public required init() { super.init() }
     public required init(with netConfig: NETPTCLConfig) { super.init(with: netConfig) }
@@ -29,8 +30,8 @@ open class WKRFirebaseUsersRouter: NETBlankRouter {
             return apiConsent(childUser)
         case .apiLoadChildUsers(_, let user):
             return apiLoadChildUsers(user)
-        case .apiLoadLinkRequests(_, let user):
-            return apiLoadLinkRequests(user)
+        case .apiLoadLinkRequests(_, let parameters, let user):
+            return apiLoadLinkRequests(parameters, user)
         case .apiLoadPendingUsers(_, let user):
             return apiLoadPendingUsers(user)
         case .apiLoadUnverifiedAccounts(_, let user):
@@ -120,12 +121,16 @@ open class WKRFirebaseUsersRouter: NETBlankRouter {
         request.method = .post
         return .success(request)
     }
-    open func apiLoadLinkRequests(_ user: DAOUser) -> NETPTCLRouterResURLRequest {
+    open func apiLoadLinkRequests(_ parameters: DNSDataDictionary,
+                                  _ user: DAOUser) -> NETPTCLRouterResURLRequest {
         let componentsResult = netConfig.urlComponents()
         if case .failure(let error) = componentsResult { DNSCore.reportError(error); return .failure(error) }
 
         var components = try! componentsResult.get() // swiftlint:disable:this force_try
         components.path += "/users/\(user.id)/accounts/linkRequests"
+        components.queryItems = parameters.map({ (key, value) -> URLQueryItem in
+            URLQueryItem(name: key, value: Self.xlt.string(from: value))
+        })
         guard let url = components.url else {
             let error = DNSError.NetworkBase.invalidUrl(.firebaseWorkers(self))
             DNSCore.reportError(error)
