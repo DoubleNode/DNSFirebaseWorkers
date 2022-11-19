@@ -23,14 +23,6 @@ public struct RSPWKRFirebaseAccountAAccount: PTCLRSPWKRFirebaseAccountAAccount {
     public var accounts: [DAOAccount] = []
 }
 
-public protocol PTCLRSPWKRFirebaseAccountAPlace: Codable {
-    var places: [DAOPlace] { get }
-}
-public struct RSPWKRFirebaseAccountAPlace: PTCLRSPWKRFirebaseAccountAPlace {
-    // MARK: - Properties -
-    public var places: [DAOPlace] = []
-}
-
 public protocol PTCLRSPWKRFirebaseAccountAUser: Codable {
     var users: [DAOUser] { get }
 }
