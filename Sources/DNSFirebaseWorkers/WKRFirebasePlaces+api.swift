@@ -19,6 +19,7 @@ public enum WKRFirebasePlacesAPI: URLRequestConvertible {
     public typealias Router = WKRFirebasePlacesRouter
     case apiLoadPlace(router: NETPTCLRouter, placeCode: String)
     case apiLoadPlaces(router: NETPTCLRouter)
+    case apiLoadPlacesForAccount(router: NETPTCLRouter, account: DAOAccount)
     case apiUpdatePlace(router: NETPTCLRouter, place: DAOPlace)
 
     public var dataRequest: NETPTCLRouterResDataRequest {
@@ -28,6 +29,7 @@ public enum WKRFirebasePlacesAPI: URLRequestConvertible {
         var netRouter: Router?
         if case .apiLoadPlace(let router, _) = self { netRouter = router as? Router }
         if case .apiLoadPlaces(let router) = self { netRouter = router as? Router }
+        if case .apiLoadPlacesForAccount(let router, _) = self { netRouter = router as? Router }
         if case .apiUpdatePlace(let router, _) = self { netRouter = router as? Router }
         guard let netRouter else {
             let error = DNSError.Systems

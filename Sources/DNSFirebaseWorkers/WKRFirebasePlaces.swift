@@ -131,6 +131,44 @@ open class WKRFirebasePlaces: WKRBlankPlaces, DecodingConfigurationProviding, En
             block?(.failure(error))
         })
     }
+    override open func intDoLoadPlaces(for account: DAOAccount,
+                                       with progress: DNSProtocols.DNSPTCLProgressBlock?,
+                                       and block: WKRPTCLPlacesBlkAPlace?,
+                                       then resultBlock: DNSPTCLResultBlock?) {
+        let callData = WKRPTCLSystemsStateData(system: DNSAppConstants.Systems.places,
+                                               endPoint: DNSAppConstants.Systems.Accounts.EndPoints.loadPlaces,
+                                               sendDebug: DNSAppConstants.Systems.Accounts.sendDebug)
+
+        guard let dataRequest = try? API.apiLoadPlacesForAccount(router: self.netRouter, account: account)
+            .dataRequest.get() else {
+            let error = DNSError.NetworkBase.dataError(.firebaseWorkers(self))
+            block?(.failure(error)); _ = resultBlock?(.error)
+            return
+        }
+        self.processRequestData(callData, dataRequest, with: resultBlock,
+                                onSuccess: { data in
+            do {
+                let response = try JSONDecoder().decode(Self.config.placesResponseType, from: data)
+                block?(.success(response.places))
+                return .success
+            } catch {
+                DNSCore.reportError(error)
+                return .failure(error)
+            }
+        },
+                                onPendingError: { error, _ in
+            if case DNSError.NetworkBase.expiredAccessToken = error {
+                return error
+            }
+            if case DNSError.NetworkBase.notFound = error {
+                return error
+            }
+            return DNSError.NetworkBase.lowerError(error: error, .firebaseWorkers(self))
+        },
+                                onError: { error, _ in
+            block?(.failure(error))
+        })
+    }
     override open func intDoLoadPlaces(for section: DAOSection,
                                        with progress: DNSPTCLProgressBlock?,
                                        and block: WKRPTCLPlacesBlkAPlace?,

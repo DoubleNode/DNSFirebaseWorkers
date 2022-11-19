@@ -37,10 +37,10 @@ open class WKRFirebaseAccountRouter: NETBlankRouter {
             return apiLinkUser(account, user)
         case .apiLoadAccount(_, let userId):
             return apiLoadAccount(userId)
+        case .apiLoadAccountsForPlace(_, let place):
+            return apiLoadAccounts(place)
         case .apiLoadAccounts(_, let user):
             return apiLoadAccounts(user)
-        case .apiLoadPlaces(_, let account):
-            return apiLoadPlaces(account)
         case .apiRenameId(_, let accountId, let newAccountId):
             return apiRenameId(accountId, newAccountId)
         case .apiSearchAccounts(_, let parameters):
@@ -261,12 +261,12 @@ open class WKRFirebaseAccountRouter: NETBlankRouter {
         request.method = .get
         return .success(request)
     }
-    open func apiLoadAccounts(_ user: DAOUser) -> NETPTCLRouterResURLRequest {
+    open func apiLoadAccounts(_ place: DAOPlace) -> NETPTCLRouterResURLRequest {
         let componentsResult = netConfig.urlComponents()
         if case .failure(let error) = componentsResult { DNSCore.reportError(error); return .failure(error) }
 
         var components = try! componentsResult.get() // swiftlint:disable:this force_try
-        components.path += "/users/\(user.id)/accounts"
+        components.path += "/places/\(place.id)/accounts"
         guard let url = components.url else {
             let error = DNSError.NetworkBase.invalidUrl(.firebaseWorkers(self))
             DNSCore.reportError(error)
@@ -280,12 +280,12 @@ open class WKRFirebaseAccountRouter: NETBlankRouter {
         request.method = .get
         return .success(request)
     }
-    open func apiLoadPlaces(_ account: DAOAccount) -> NETPTCLRouterResURLRequest {
+    open func apiLoadAccounts(_ user: DAOUser) -> NETPTCLRouterResURLRequest {
         let componentsResult = netConfig.urlComponents()
         if case .failure(let error) = componentsResult { DNSCore.reportError(error); return .failure(error) }
 
         var components = try! componentsResult.get() // swiftlint:disable:this force_try
-        components.path += "/accounts/\(account.id)/places"
+        components.path += "/users/\(user.id)/accounts"
         guard let url = components.url else {
             let error = DNSError.NetworkBase.invalidUrl(.firebaseWorkers(self))
             DNSCore.reportError(error)
