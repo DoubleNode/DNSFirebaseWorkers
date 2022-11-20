@@ -24,9 +24,11 @@ public extension DNSAppConstants {
         }
 
         static public let accounts = "accounts"
+        static public let announcements = "announcements"
         static public let auth = "auth"
         static public let cart = "cart"
         static public let checkout = "checkout"
+        static public let events = "events"
         static public let places = "places"
         static public let users = "users"
 
@@ -68,6 +70,26 @@ public extension DNSAppConstants {
                 static public let updatePushToken = "updatePushToken"
                 static public let updateUser = "updateUser"
                 static public let verifyAccount = "verifyAccount"
+            }
+        }
+        public enum Announcements {
+            static public let codeBase = "Announcements"
+
+            static public let codeDebug = "SystemDebug\(codeBase)"
+            static public let codeStatus = "SystemStatus\(codeBase)"
+
+            static public var sendDebug: Bool { debug && (status != Status.normal) }
+
+            static public var status: String {
+                remoteConfig[codeStatus].stringValue ?? Status.normal
+            }
+            static public var debug: Bool {
+                remoteConfig[codeDebug].boolValue
+            }
+            public enum EndPoints {
+                static public let loadAnnouncements = "loadAnnouncements"
+                static public let removeAnnouncement = "removeAnnouncement"
+                static public let updateAnnouncement = "updateAnnouncement"
             }
         }
         public enum Auth {
@@ -130,6 +152,26 @@ public extension DNSAppConstants {
             public enum EndPoints {
                 static public let applyCoupon = "applyCoupon"
                 static public let checkout = "checkout"
+            }
+        }
+        public enum Events {
+            static public let codeBase = "Events"
+
+            static public let codeDebug = "SystemDebug\(codeBase)"
+            static public let codeStatus = "SystemStatus\(codeBase)"
+
+            static public var sendDebug: Bool { debug && (status != Status.normal) }
+
+            static public var status: String {
+                remoteConfig[codeStatus].stringValue ?? Status.normal
+            }
+            static public var debug: Bool {
+                remoteConfig[codeDebug].boolValue
+            }
+            public enum EndPoints {
+                static public let loadEvents = "loadEvents"
+                static public let removeEvent = "removeEvent"
+                static public let updateEvent = "updateEvent"
             }
         }
         public enum Places {
