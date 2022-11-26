@@ -22,15 +22,43 @@ open class WKRFirebaseAnnouncementsRouter: NETBlankRouter {
 
     open func asURLRequest(for api: API) -> NETPTCLRouterResURLRequest {
         switch api {
+        case .apiLoadCurrentAnnouncements(_):
+            return apiLoadCurrentAnnouncements()
         case .apiLoadAnnouncements(_):
             return apiLoadAnnouncements()
         case .apiLoadAnnouncementsForPlace(_, let place):
             return apiLoadAnnouncementsForPlace(place)
-        case .apiRemoveAnnouncement(_, let announcement, let place):
-            return apiRemoveAnnouncement(announcement, place)
-        case .apiUpdateAnnouncement(_, let announcement, let place):
-            return apiUpdateAnnouncement(announcement, place)
+        case .apiRemoveAnnouncement(_, let announcement):
+            return apiRemoveAnnouncement(announcement)
+        case .apiRemoveAnnouncementForPlace(_, let announcement, let place):
+            return apiRemoveAnnouncementForPlace(announcement, place)
+        case .apiUpdateAnnouncement(_, let announcement):
+            return apiUpdateAnnouncement(announcement)
+        case .apiUpdateAnnouncementForPlace(_, let announcement, let place):
+            return apiUpdateAnnouncementForPlace(announcement, place)
         }
+    }
+    open func apiLoadCurrentAnnouncements() -> NETPTCLRouterResURLRequest {
+        let parameters: [String: String] = [:]
+        let componentsResult = netConfig.urlComponents()
+        if case .failure(let error) = componentsResult { DNSCore.reportError(error); return .failure(error) }
+
+        var components = try! componentsResult.get() // swiftlint:disable:this force_try
+        components.path += "/announcements/current"
+        components.queryItems = parameters.map({ (key, value) -> URLQueryItem in
+            URLQueryItem(name: key, value: String(value))
+        })
+        guard let url = components.url else {
+            let error = DNSError.NetworkBase.invalidUrl(.firebaseWorkers(self))
+            DNSCore.reportError(error)
+            return .failure(error)
+        }
+        let requestResult = super.urlRequest(using: url)
+        if case .failure(let error) = requestResult { DNSCore.reportError(error); return .failure(error) }
+
+        var request = try! requestResult.get() // swiftlint:disable:this force_try
+        request.method = .get
+        return .success(request)
     }
     open func apiLoadAnnouncements() -> NETPTCLRouterResURLRequest {
         let parameters: [String: String] = [:]
@@ -73,7 +101,26 @@ open class WKRFirebaseAnnouncementsRouter: NETBlankRouter {
         request.method = .get
         return .success(request)
     }
-    open func apiRemoveAnnouncement(_ announcement: DAOAnnouncement, _ place: DAOPlace) -> NETPTCLRouterResURLRequest {
+    open func apiRemoveAnnouncement(_ announcement: DAOAnnouncement) -> NETPTCLRouterResURLRequest {
+        let componentsResult = netConfig.urlComponents()
+        if case .failure(let error) = componentsResult { DNSCore.reportError(error); return .failure(error) }
+
+        var components = try! componentsResult.get() // swiftlint:disable:this force_try
+        components.path += "/announcements/\(announcement.id)"
+        guard let url = components.url else {
+            let error = DNSError.NetworkBase.invalidUrl(.firebaseWorkers(self))
+            DNSCore.reportError(error)
+            return .failure(error)
+        }
+
+        let requestResult = super.urlRequest(using: url)
+        if case .failure(let error) = requestResult { DNSCore.reportError(error); return .failure(error) }
+
+        var request = try! requestResult.get() // swiftlint:disable:this force_try
+        request.method = .delete
+        return .success(request)
+    }
+    open func apiRemoveAnnouncementForPlace(_ announcement: DAOAnnouncement, _ place: DAOPlace) -> NETPTCLRouterResURLRequest {
         let componentsResult = netConfig.urlComponents()
         if case .failure(let error) = componentsResult { DNSCore.reportError(error); return .failure(error) }
 
@@ -92,7 +139,32 @@ open class WKRFirebaseAnnouncementsRouter: NETBlankRouter {
         request.method = .delete
         return .success(request)
     }
-    open func apiUpdateAnnouncement(_ announcement: DAOAnnouncement, _ place: DAOPlace) -> NETPTCLRouterResURLRequest {
+    open func apiUpdateAnnouncement(_ announcement: DAOAnnouncement) -> NETPTCLRouterResURLRequest {
+        let componentsResult = netConfig.urlComponents()
+        if case .failure(let error) = componentsResult { DNSCore.reportError(error); return .failure(error) }
+
+        var components = try! componentsResult.get() // swiftlint:disable:this force_try
+        components.path += "/announcements/\(announcement.id)"
+        guard let url = components.url else {
+            let error = DNSError.NetworkBase.invalidUrl(.firebaseWorkers(self))
+            DNSCore.reportError(error)
+            return .failure(error)
+        }
+
+        let requestResult = super.urlRequest(using: url)
+        if case .failure(let error) = requestResult { DNSCore.reportError(error); return .failure(error) }
+
+        var request = try! requestResult.get() // swiftlint:disable:this force_try
+        request.method = .post
+        do {
+            request = try JSONParameterEncoder().encode(announcement, into: request)
+        } catch {
+            DNSCore.reportError(error)
+            return .failure(error)
+        }
+        return .success(request)
+    }
+    open func apiUpdateAnnouncementForPlace(_ announcement: DAOAnnouncement, _ place: DAOPlace) -> NETPTCLRouterResURLRequest {
         let componentsResult = netConfig.urlComponents()
         if case .failure(let error) = componentsResult { DNSCore.reportError(error); return .failure(error) }
 

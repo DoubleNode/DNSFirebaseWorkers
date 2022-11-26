@@ -17,20 +17,26 @@ import Foundation
 
 public enum WKRFirebaseAnnouncementsAPI: URLRequestConvertible {
     public typealias Router = WKRFirebaseAnnouncementsRouter
+    case apiLoadCurrentAnnouncements(router: NETPTCLRouter)
     case apiLoadAnnouncements(router: NETPTCLRouter)
     case apiLoadAnnouncementsForPlace(router: NETPTCLRouter, place: DAOPlace)
-    case apiRemoveAnnouncement(router: NETPTCLRouter, announcement: DAOAnnouncement, place: DAOPlace)
-    case apiUpdateAnnouncement(router: NETPTCLRouter, announcement: DAOAnnouncement, place: DAOPlace)
+    case apiRemoveAnnouncement(router: NETPTCLRouter, announcement: DAOAnnouncement)
+    case apiRemoveAnnouncementForPlace(router: NETPTCLRouter, announcement: DAOAnnouncement, place: DAOPlace)
+    case apiUpdateAnnouncement(router: NETPTCLRouter, announcement: DAOAnnouncement)
+    case apiUpdateAnnouncementForPlace(router: NETPTCLRouter, announcement: DAOAnnouncement, place: DAOPlace)
 
     public var dataRequest: NETPTCLRouterResDataRequest {
         .success(AF.request(self))
     }
     public func asURLRequest() throws -> NETPTCLRouterRtnURLRequest {
         var netRouter: Router?
+        if case .apiLoadCurrentAnnouncements(let router) = self { netRouter = router as? Router }
         if case .apiLoadAnnouncements(let router) = self { netRouter = router as? Router }
         if case .apiLoadAnnouncementsForPlace(let router, _) = self { netRouter = router as? Router }
-        if case .apiRemoveAnnouncement(let router, _, _) = self { netRouter = router as? Router }
-        if case .apiUpdateAnnouncement(let router, _, _) = self { netRouter = router as? Router }
+        if case .apiRemoveAnnouncement(let router, _) = self { netRouter = router as? Router }
+        if case .apiRemoveAnnouncementForPlace(let router, _, _) = self { netRouter = router as? Router }
+        if case .apiUpdateAnnouncement(let router, _) = self { netRouter = router as? Router }
+        if case .apiUpdateAnnouncementForPlace(let router, _, _) = self { netRouter = router as? Router }
         guard let netRouter else {
             let error = DNSError.Systems
                 .invalidParameters(parameters: ["netRouter"], .firebaseWorkers(self))

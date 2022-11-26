@@ -22,3 +22,12 @@ public struct RSPWKRFirebaseAnnouncementsAAnnouncement: PTCLRSPWKRFirebaseAnnoun
     // MARK: - Properties -
     public var announcements: [DAOAnnouncement] = []
 }
+public protocol PTCLRSPWKRFirebaseAnnouncementsAAnnouncementPlace: Codable {
+    var announcements: [DAOAnnouncement] { get }
+    var places: [DAOPlace] { get }
+}
+public struct RSPWKRFirebaseAnnouncementsAAnnouncementPlace: PTCLRSPWKRFirebaseAnnouncementsAAnnouncementPlace {
+    // MARK: - Properties -
+    public var announcements: [DAOAnnouncement] = []
+    public var places: [DAOPlace] = []
+}
