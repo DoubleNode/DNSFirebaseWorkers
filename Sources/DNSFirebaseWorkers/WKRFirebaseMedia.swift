@@ -68,8 +68,10 @@ open class WKRFirebaseMedia: WKRBlankMedia, DecodingConfigurationProviding, Enco
         }
         
         let imageRef = self.storage.reference().child(path)
+        let metadata = StorageMetadata()
+        metadata.contentType = "image/jpeg"
 
-        self.utilityUploadMedia(data: imageData,
+        self.utilityUploadMedia(data: imageData, with: metadata,
                                 to: imageRef,
                                 with: progress) { result in
             if case .failure(let error) = result {
@@ -77,7 +79,9 @@ open class WKRFirebaseMedia: WKRBlankMedia, DecodingConfigurationProviding, Enco
                 block?(.failure(error)); _ = resultBlock?(.error)
                 return
             }
-            block?(result); _ = resultBlock?(.completed)
+            let media = try! result.get() // swiftlint:disable:this force_try
+            media.type = .staticImage
+            block?(.success(media)); _ = resultBlock?(.completed)
         }
     }
     override open func intDoUpload(_ pdfDocument: PDFDocument,
@@ -85,20 +89,61 @@ open class WKRFirebaseMedia: WKRBlankMedia, DecodingConfigurationProviding, Enco
                                    with progress: DNSPTCLProgressBlock?,
                                    and block: WKRPTCLMediaBlkMedia?,
                                    then resultBlock: DNSPTCLResultBlock?) {
+        guard let pdfDocumentData = pdfDocument.dataRepresentation() else {
+            let error = DNSError.NetworkBase.dataError(.firebaseWorkers(self))
+            block?(.failure(error)); _ = resultBlock?(.error)
+            return
+        }
+        
+        let pdfDocumentRef = self.storage.reference().child(path)
+        let metadata = StorageMetadata()
+        metadata.contentType = "application/pdf"
+
+        self.utilityUploadMedia(data: pdfDocumentData, with: metadata,
+                                to: pdfDocumentRef,
+                                with: progress) { result in
+            if case .failure(let error) = result {
+                DNSCore.reportError(error)
+                block?(.failure(error)); _ = resultBlock?(.error)
+                return
+            }
+            let media = try! result.get() // swiftlint:disable:this force_try
+            media.type = .pdfDocument
+            block?(.success(media)); _ = resultBlock?(.completed)
+        }
     }
     override open func intDoUpload(_ text: String,
                                    to path: String,
                                    with progress: DNSPTCLProgressBlock?,
                                    and block: WKRPTCLMediaBlkMedia?,
                                    then resultBlock: DNSPTCLResultBlock?) {
+        let textData = Data(text.utf8)
+
+        let textRef = self.storage.reference().child(path)
+        let metadata = StorageMetadata()
+        metadata.contentType = "text/plain"
+
+        self.utilityUploadMedia(data: textData, with: metadata,
+                                to: textRef,
+                                with: progress) { result in
+            if case .failure(let error) = result {
+                DNSCore.reportError(error)
+                block?(.failure(error)); _ = resultBlock?(.error)
+                return
+            }
+            let media = try! result.get() // swiftlint:disable:this force_try
+            media.type = .text
+            block?(.success(media)); _ = resultBlock?(.completed)
+        }
     }
     
     // MARK: - Utility methods -
     func utilityUploadMedia(data: Data,
+                            with metadata: StorageMetadata? = nil,
                             to storageRef: StorageReference,
                             with progressBlk: DNSPTCLProgressBlock?,
                             and block: WKRPTCLMediaBlkMedia?) {
-        let uploadTask = storageRef.putData(data, metadata: nil) { metadata, error in
+        let uploadTask = storageRef.putData(data, metadata: metadata) { metadata, error in
             if let error {
                 block?(.failure(error));
                 return
