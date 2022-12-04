@@ -56,6 +56,46 @@ open class WKRFirebaseMedia: WKRBlankMedia, DecodingConfigurationProviding, Enco
                                    and block: WKRPTCLMediaBlkVoid?,
                                    then resultBlock: DNSPTCLResultBlock?) {
     }
+    override open func intDoUpload(from fileUrl: URL,
+                                   to path: String,
+                                   with progress: DNSPTCLProgressBlock?,
+                                   and block: WKRPTCLMediaBlkMedia?,
+                                   then resultBlock: DNSPTCLResultBlock?) {
+        let imageRef = self.storage.reference().child(path)
+        let metadata = StorageMetadata()
+        switch fileUrl.pathExtension {
+        case "gif":
+            metadata.contentType = "image/gif"
+            metadata.customMetadata = ["dnsMediaType": DNSMediaType.animatedImage.rawValue]
+        case "jpg", "jpeg":
+            metadata.contentType = "image/jpeg"
+            metadata.customMetadata = ["dnsMediaType": DNSMediaType.staticImage.rawValue]
+        case "pdf":
+            metadata.contentType = "application/pdf"
+            metadata.customMetadata = ["dnsMediaType": DNSMediaType.pdfDocument.rawValue]
+        case "png":
+            metadata.contentType = "image/png"
+            metadata.customMetadata = ["dnsMediaType": DNSMediaType.staticImage.rawValue]
+        case "txt":
+            metadata.contentType = "text/plain"
+            metadata.customMetadata = ["dnsMediaType": DNSMediaType.text.rawValue]
+        default:
+            break
+        }
+
+        self.utilityUploadMedia(from: fileUrl, with: metadata,
+                                to: imageRef,
+                                with: progress) { result in
+            if case .failure(let error) = result {
+                DNSCore.reportError(error)
+                block?(.failure(error)); _ = resultBlock?(.error)
+                return
+            }
+            let media = try! result.get() // swiftlint:disable:this force_try
+            media.type = .staticImage
+            block?(.success(media)); _ = resultBlock?(.completed)
+        }
+    }
     override open func intDoUpload(_ image: UIImage,
                                    to path: String,
                                    with progress: DNSPTCLProgressBlock?,
@@ -70,6 +110,7 @@ open class WKRFirebaseMedia: WKRBlankMedia, DecodingConfigurationProviding, Enco
         let imageRef = self.storage.reference().child(path)
         let metadata = StorageMetadata()
         metadata.contentType = "image/jpeg"
+        metadata.customMetadata = ["dnsMediaType": DNSMediaType.staticImage.rawValue]
 
         self.utilityUploadMedia(data: imageData, with: metadata,
                                 to: imageRef,
@@ -98,6 +139,7 @@ open class WKRFirebaseMedia: WKRBlankMedia, DecodingConfigurationProviding, Enco
         let pdfDocumentRef = self.storage.reference().child(path)
         let metadata = StorageMetadata()
         metadata.contentType = "application/pdf"
+        metadata.customMetadata = ["dnsMediaType": DNSMediaType.pdfDocument.rawValue]
 
         self.utilityUploadMedia(data: pdfDocumentData, with: metadata,
                                 to: pdfDocumentRef,
@@ -122,6 +164,7 @@ open class WKRFirebaseMedia: WKRBlankMedia, DecodingConfigurationProviding, Enco
         let textRef = self.storage.reference().child(path)
         let metadata = StorageMetadata()
         metadata.contentType = "text/plain"
+        metadata.customMetadata = ["dnsMediaType": DNSMediaType.text.rawValue]
 
         self.utilityUploadMedia(data: textData, with: metadata,
                                 to: textRef,
@@ -148,13 +191,6 @@ open class WKRFirebaseMedia: WKRBlankMedia, DecodingConfigurationProviding, Enco
                 block?(.failure(error));
                 return
             }
-//            guard let metadata = metadata else {
-//                let error = DNSError.NetworkBase.dataError(.firebaseWorkers(self))
-//                block?(.failure(error));
-//                return
-//            }
-
-//            let size = metadata.size
             storageRef.downloadURL { url, error in
                 if let error {
                     block?(.failure(error));
@@ -165,8 +201,44 @@ open class WKRFirebaseMedia: WKRBlankMedia, DecodingConfigurationProviding, Enco
                     block?(.failure(error));
                     return
                 }
+                let mediaTypeStr = metadata?.customMetadata?["dnsMediaType"] ?? ""
                 let media = Self.createMedia()
-                media.type = .staticImage
+                media.type = DNSMediaType(rawValue: mediaTypeStr) ?? .unknown
+                media.url = DNSURL(with: downloadUrl)
+                block?(.success(media))
+            }
+        }
+        _ = uploadTask.observe(.progress) { snapshot in
+            guard let progress = snapshot.progress else {
+                return
+            }
+            let percentComplete = Double(progress.completedUnitCount) / Double(progress.totalUnitCount)
+            progressBlk?(progress.completedUnitCount, progress.totalUnitCount, percentComplete, progress.localizedDescription)
+        }
+    }
+    func utilityUploadMedia(from fileUrl: URL,
+                            with metadata: StorageMetadata? = nil,
+                            to storageRef: StorageReference,
+                            with progressBlk: DNSPTCLProgressBlock?,
+                            and block: WKRPTCLMediaBlkMedia?) {
+        let uploadTask = storageRef.putFile(from: fileUrl, metadata: metadata) { metadata, error in
+            if let error {
+                block?(.failure(error));
+                return
+            }
+            storageRef.downloadURL { url, error in
+                if let error {
+                    block?(.failure(error));
+                    return
+                }
+                guard let downloadUrl = url else {
+                    let error = DNSError.NetworkBase.dataError(.firebaseWorkers(self))
+                    block?(.failure(error));
+                    return
+                }
+                let mediaTypeStr = metadata?.customMetadata?["dnsMediaType"] ?? ""
+                let media = Self.createMedia()
+                media.type = DNSMediaType(rawValue: mediaTypeStr) ?? .unknown
                 media.url = DNSURL(with: downloadUrl)
                 block?(.success(media))
             }
