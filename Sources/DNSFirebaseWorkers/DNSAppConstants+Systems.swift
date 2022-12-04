@@ -27,8 +27,10 @@ public extension DNSAppConstants {
         static public let announcements = "announcements"
         static public let auth = "auth"
         static public let cart = "cart"
+        static public let chats = "chats"
         static public let checkout = "checkout"
         static public let events = "events"
+        static public let media = "media"
         static public let places = "places"
         static public let users = "users"
 
@@ -135,6 +137,27 @@ public extension DNSAppConstants {
                 static public let removeFromBasket = "removeFromBasket"
             }
         }
+        public enum Chats {
+            static public let codeBase = "Chats"
+
+            static public let codeDebug = "SystemDebug\(codeBase)"
+            static public let codeStatus = "SystemStatus\(codeBase)"
+
+            static public var sendDebug: Bool { debug && (status != Status.normal) }
+
+            static public var status: String {
+                remoteConfig[codeStatus].stringValue ?? Status.normal
+            }
+            static public var debug: Bool {
+                remoteConfig[codeDebug].boolValue
+            }
+            public enum EndPoints {
+                static public let loadChat = "loadChat"
+                static public let loadMessages = "loadMessages"
+                static public let removeMessage = "removeMessage"
+                static public let updateMessage = "updateMessage"
+            }
+        }
         public enum Checkout {
             static public let codeBase = "Checkout"
 
@@ -172,6 +195,25 @@ public extension DNSAppConstants {
                 static public let loadEvents = "loadEvents"
                 static public let removeEvent = "removeEvent"
                 static public let updateEvent = "updateEvent"
+            }
+        }
+        public enum Media {
+            static public let codeBase = "Media"
+
+            static public let codeDebug = "SystemDebug\(codeBase)"
+            static public let codeStatus = "SystemStatus\(codeBase)"
+
+            static public var sendDebug: Bool { debug && (status != Status.normal) }
+
+            static public var status: String {
+                remoteConfig[codeStatus].stringValue ?? Status.normal
+            }
+            static public var debug: Bool {
+                remoteConfig[codeDebug].boolValue
+            }
+            public enum EndPoints {
+                static public let removeMedia = "removeMedia"
+                static public let uploadMedia = "uploadMedia"
             }
         }
         public enum Places {

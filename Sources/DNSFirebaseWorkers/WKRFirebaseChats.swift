@@ -1,5 +1,5 @@
 //
-//  WKRFirebaseEvents.swift
+//  WKRFirebaseChats.swift
 //  DoubleNode Swift Framework (DNSFramework) - DNSFirebaseWorkers
 //
 //  Created by Darren Ehlers.
@@ -15,53 +15,54 @@ import DNSError
 import DNSProtocols
 import FirebaseFirestore
 
-public protocol PTCLCFGWKRFirebaseEvents: PTCLCFGDAOEvent {
-    var eventsResponseType: any PTCLRSPWKRFirebaseEventsAEvent.Type { get }
+public protocol PTCLCFGWKRFirebaseChats: PTCLCFGDAOChat {
+    var messagesResponseType: any PTCLRSPWKRFirebaseChatsAChatMessage.Type { get }
 }
-public class CFGWKRFirebaseEvents: PTCLCFGWKRFirebaseEvents {
-    public var eventsResponseType: any PTCLRSPWKRFirebaseEventsAEvent.Type = RSPWKRFirebaseEventsAEvent.self
+public class CFGWKRFirebaseChats: PTCLCFGWKRFirebaseChats {
+    public var messagesResponseType: any PTCLRSPWKRFirebaseChatsAChatMessage.Type = RSPWKRFirebaseChatsAChatMessage.self
 
-    public var eventType: DAOEvent.Type = DAOEvent.self
-    open func event<K>(from container: KeyedDecodingContainer<K>,
-                       forKey key: KeyedDecodingContainer<K>.Key) -> DAOEvent? where K: CodingKey {
-        do { return try container.decodeIfPresent(DAOEvent.self, forKey: key, configuration: self) ?? nil } catch { }
+    public var chatType: DAOChat.Type = DAOChat.self
+    open func chat<K>(from container: KeyedDecodingContainer<K>,
+                      forKey key: KeyedDecodingContainer<K>.Key) -> DAOChat? where K: CodingKey {
+        do { return try container.decodeIfPresent(DAOChat.self, forKey: key, configuration: self) ?? nil } catch { }
         return nil
     }
-    open func eventArray<K>(from container: KeyedDecodingContainer<K>,
-                            forKey key: KeyedDecodingContainer<K>.Key) -> [DAOEvent] where K: CodingKey {
-        do { return try container.decodeIfPresent([DAOEvent].self, forKey: key, configuration: self) ?? [] } catch { }
+    open func chatArray<K>(from container: KeyedDecodingContainer<K>,
+                           forKey key: KeyedDecodingContainer<K>.Key) -> [DAOChat] where K: CodingKey {
+        do { return try container.decodeIfPresent([DAOChat].self, forKey: key, configuration: self) ?? [] } catch { }
         return []
     }
 }
 // swiftlint:disable:next type_body_length
-open class WKRFirebaseEvents: WKRBlankEvents, DecodingConfigurationProviding, EncodingConfigurationProviding {
-    public typealias Config = PTCLCFGWKRFirebaseEvents
+open class WKRFirebaseChats: WKRBlankChats, DecodingConfigurationProviding, EncodingConfigurationProviding {
+    public typealias Config = PTCLCFGWKRFirebaseChats
     public typealias DecodingConfiguration = Config
     public typealias EncodingConfiguration = Config
-    public static var config: Config = CFGWKRFirebaseEvents()
+    public static var config: Config = CFGWKRFirebaseChats()
 
     public static var decodingConfiguration: DecodingConfiguration { Self.config }
     public static var encodingConfiguration: EncodingConfiguration { Self.config }
 
-    typealias API = WKRFirebaseEventsAPI // swiftlint:disable:this type_name
+    typealias API = WKRFirebaseChatsAPI // swiftlint:disable:this type_name
 
     // MARK: - Class Factory methods -
-    open class func createEvent() -> DAOEvent { config.eventType.init() }
-    open class func createEvent(from object: DAOEvent) -> DAOEvent { config.eventType.init(from: object) }
-    open class func createEvent(from data: DNSDataDictionary) -> DAOEvent? { config.eventType.init(from: data) }
+    open class func createChat() -> DAOChat { config.chatType.init() }
+    open class func createChat(from object: DAOChat) -> DAOChat { config.chatType.init(from: object) }
+    open class func createChat(from data: DNSDataDictionary) -> DAOChat? { config.chatType.init(from: data) }
 
     // MARK: - Properties -
     let db = Firestore.firestore()
 
     // MARK: - Internal Work Methods
-    override open func intDoLoadEvents(with progress: DNSPTCLProgressBlock?,
-                                       and block: WKRPTCLEventsBlkAEvent?,
-                                       then resultBlock: DNSPTCLResultBlock?) {
-        let callData = WKRPTCLSystemsStateData(system: DNSAppConstants.Systems.events,
-                                               endPoint: DNSAppConstants.Systems.Events.EndPoints.loadEvents,
-                                               sendDebug: DNSAppConstants.Systems.Events.sendDebug)
+    override open func intDoLoadChat(for id: String,
+                                     with progress: DNSPTCLProgressBlock?,
+                                     and block: WKRPTCLChatsBlkChat?,
+                                     then resultBlock: DNSPTCLResultBlock?) {
+        let callData = WKRPTCLSystemsStateData(system: DNSAppConstants.Systems.chats,
+                                               endPoint: DNSAppConstants.Systems.Chats.EndPoints.loadChat,
+                                               sendDebug: DNSAppConstants.Systems.Chats.sendDebug)
 
-        guard let dataRequest = try? API.apiLoadEvents(router: self.netRouter)
+        guard let dataRequest = try? API.apiLoadChat(router: self.netRouter, id: id)
             .dataRequest.get() else {
             let error = DNSError.NetworkBase.dataError(.firebaseWorkers(self))
             block?(.failure(error)); _ = resultBlock?(.error)
@@ -70,8 +71,8 @@ open class WKRFirebaseEvents: WKRBlankEvents, DecodingConfigurationProviding, En
         self.processRequestData(callData, dataRequest, with: resultBlock,
                                 onSuccess: { data in
             do {
-                let response = try JSONDecoder().decode(Self.config.eventsResponseType, from: data)
-                block?(.success(response.events))
+                let chat = try JSONDecoder().decode(Self.config.chatType, from: data)
+                block?(.success(chat))
                 return .success
             } catch {
                 DNSCore.reportError(error)
@@ -88,15 +89,15 @@ open class WKRFirebaseEvents: WKRBlankEvents, DecodingConfigurationProviding, En
             block?(.failure(error))
         })
     }
-    override open func intDoLoadEvents(for place: DAOPlace,
-                                       with progress: DNSPTCLProgressBlock?,
-                                       and block: WKRPTCLEventsBlkAEvent?,
-                                       then resultBlock: DNSPTCLResultBlock?) {
-        let callData = WKRPTCLSystemsStateData(system: DNSAppConstants.Systems.events,
-                                               endPoint: DNSAppConstants.Systems.Events.EndPoints.loadEvents,
-                                               sendDebug: DNSAppConstants.Systems.Events.sendDebug)
+    override open func intDoLoadMessages(for chat: DAOChat,
+                                         with progress: DNSPTCLProgressBlock?,
+                                         and block: WKRPTCLChatsBlkAChatMessage?,
+                                         then resultBlock: DNSPTCLResultBlock?) {
+        let callData = WKRPTCLSystemsStateData(system: DNSAppConstants.Systems.chats,
+                                               endPoint: DNSAppConstants.Systems.Chats.EndPoints.loadMessages,
+                                               sendDebug: DNSAppConstants.Systems.Chats.sendDebug)
 
-        guard let dataRequest = try? API.apiLoadEventsForPlace(router: self.netRouter, place: place)
+        guard let dataRequest = try? API.apiLoadMessages(router: self.netRouter, chat: chat)
             .dataRequest.get() else {
             let error = DNSError.NetworkBase.dataError(.firebaseWorkers(self))
             block?(.failure(error)); _ = resultBlock?(.error)
@@ -105,8 +106,8 @@ open class WKRFirebaseEvents: WKRBlankEvents, DecodingConfigurationProviding, En
         self.processRequestData(callData, dataRequest, with: resultBlock,
                                 onSuccess: { data in
             do {
-                let response = try JSONDecoder().decode(Self.config.eventsResponseType, from: data)
-                block?(.success(response.events))
+                let response = try JSONDecoder().decode(Self.config.messagesResponseType, from: data)
+                block?(.success(response.messages))
                 return .success
             } catch {
                 DNSCore.reportError(error)
@@ -123,16 +124,15 @@ open class WKRFirebaseEvents: WKRBlankEvents, DecodingConfigurationProviding, En
             block?(.failure(error))
         })
     }
-    override open func intDoRemove(_ event: DAOEvent,
-                                   for place: DAOPlace,
+    override open func intDoRemove(_ message: DAOChatMessage,
                                    with progress: DNSPTCLProgressBlock?,
-                                   and block: WKRPTCLEventsBlkVoid?,
+                                   and block: WKRPTCLChatsBlkVoid?,
                                    then resultBlock: DNSPTCLResultBlock?) {
-        let callData = WKRPTCLSystemsStateData(system: DNSAppConstants.Systems.events,
-                                               endPoint: DNSAppConstants.Systems.Events.EndPoints.removeEvent,
-                                               sendDebug: DNSAppConstants.Systems.Events.sendDebug)
+        let callData = WKRPTCLSystemsStateData(system: DNSAppConstants.Systems.chats,
+                                               endPoint: DNSAppConstants.Systems.Chats.EndPoints.removeMessage,
+                                               sendDebug: DNSAppConstants.Systems.Chats.sendDebug)
 
-        guard let dataRequest = try? API.apiRemoveEvent(router: self.netRouter, event: event, place: place)
+        guard let dataRequest = try? API.apiRemoveMessage(router: self.netRouter, message: message)
             .dataRequest.get() else {
             let error = DNSError.NetworkBase.dataError(.firebaseWorkers(self))
             block?(.failure(error)); _ = resultBlock?(.error)
@@ -153,16 +153,15 @@ open class WKRFirebaseEvents: WKRBlankEvents, DecodingConfigurationProviding, En
             block?(.failure(error))
         })
     }
-    override open func intDoUpdate(_ event: DAOEvent,
-                                   for place: DAOPlace,
+    override open func intDoUpdate(_ message: DAOChatMessage,
                                    with progress: DNSPTCLProgressBlock?,
-                                   and block: WKRPTCLEventsBlkVoid?,
+                                   and block: WKRPTCLChatsBlkVoid?,
                                    then resultBlock: DNSPTCLResultBlock?) {
-        let callData = WKRPTCLSystemsStateData(system: DNSAppConstants.Systems.events,
-                                               endPoint: DNSAppConstants.Systems.Events.EndPoints.updateEvent,
-                                               sendDebug: DNSAppConstants.Systems.Events.sendDebug)
+        let callData = WKRPTCLSystemsStateData(system: DNSAppConstants.Systems.chats,
+                                               endPoint: DNSAppConstants.Systems.Chats.EndPoints.updateMessage,
+                                               sendDebug: DNSAppConstants.Systems.Chats.sendDebug)
 
-        guard let dataRequest = try? API.apiUpdateEvent(router: self.netRouter, event: event, place: place)
+        guard let dataRequest = try? API.apiUpdateMessage(router: self.netRouter, message: message)
             .dataRequest.get() else {
             let error = DNSError.NetworkBase.dataError(.firebaseWorkers(self))
             block?(.failure(error)); _ = resultBlock?(.error)
