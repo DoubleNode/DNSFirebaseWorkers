@@ -63,7 +63,8 @@ open class WKRFirebaseMedia: WKRBlankMedia, DecodingConfigurationProviding, Enco
                                    then resultBlock: DNSPTCLResultBlock?) {
         let imageRef = self.storage.reference().child(path)
         let metadata = StorageMetadata()
-        switch fileUrl.pathExtension {
+        let pathUrl = URL(string: path)
+        switch pathUrl?.pathExtension {
         case "gif":
             metadata.contentType = "image/gif"
             metadata.customMetadata = ["dnsMediaType": DNSMediaType.animatedImage.rawValue]
