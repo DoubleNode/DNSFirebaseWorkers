@@ -55,6 +55,16 @@ open class WKRFirebaseMedia: WKRBlankMedia, DecodingConfigurationProviding, Enco
                                    with progress: DNSPTCLProgressBlock?,
                                    and block: WKRPTCLMediaBlkVoid?,
                                    then resultBlock: DNSPTCLResultBlock?) {
+        let imageRef = self.storage.reference().child(media.path)
+        self.utilityRemoveMedia(from: imageRef,
+                                with: progress) { result in
+            if case .failure(let error) = result {
+                DNSCore.reportError(error)
+                block?(.failure(error)); _ = resultBlock?(.error)
+                return
+            }
+            block?(.success); _ = resultBlock?(.completed)
+        }
     }
     override open func intDoUpload(from fileUrl: URL,
                                    to path: String,
@@ -182,6 +192,17 @@ open class WKRFirebaseMedia: WKRBlankMedia, DecodingConfigurationProviding, Enco
     }
     
     // MARK: - Utility methods -
+    func utilityRemoveMedia(from storageRef: StorageReference,
+                            with progressBlk: DNSPTCLProgressBlock?,
+                            and block: WKRPTCLMediaBlkVoid?) {
+        storageRef.delete { error in
+            if let error {
+                block?(.failure(error));
+                return
+            }
+            block?(.success)
+        }
+    }
     func utilityUploadMedia(data: Data,
                             with metadata: StorageMetadata? = nil,
                             to storageRef: StorageReference,
