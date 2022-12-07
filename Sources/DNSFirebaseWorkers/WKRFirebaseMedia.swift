@@ -55,6 +55,16 @@ open class WKRFirebaseMedia: WKRBlankMedia, DecodingConfigurationProviding, Enco
                                    with progress: DNSPTCLProgressBlock?,
                                    and block: WKRPTCLMediaBlkVoid?,
                                    then resultBlock: DNSPTCLResultBlock?) {
+        let imageRef = self.storage.reference().child(media.path)
+        self.utilityRemoveMedia(from: imageRef,
+                                with: progress) { result in
+            if case .failure(let error) = result {
+                DNSCore.reportError(error)
+                block?(.failure(error)); _ = resultBlock?(.error)
+                return
+            }
+            block?(.success); _ = resultBlock?(.completed)
+        }
     }
     override open func intDoUpload(from fileUrl: URL,
                                    to path: String,
@@ -64,20 +74,26 @@ open class WKRFirebaseMedia: WKRBlankMedia, DecodingConfigurationProviding, Enco
         let imageRef = self.storage.reference().child(path)
         let metadata = StorageMetadata()
         let pathUrl = URL(string: path)
+        var mediaType: DNSMediaType = .unknown
         switch pathUrl?.pathExtension {
         case "gif":
+            mediaType = .animatedImage
             metadata.contentType = "image/gif"
             metadata.customMetadata = ["dnsMediaType": DNSMediaType.animatedImage.rawValue]
         case "jpg", "jpeg":
+            mediaType = .staticImage
             metadata.contentType = "image/jpeg"
             metadata.customMetadata = ["dnsMediaType": DNSMediaType.staticImage.rawValue]
         case "pdf":
+            mediaType = .pdfDocument
             metadata.contentType = "application/pdf"
             metadata.customMetadata = ["dnsMediaType": DNSMediaType.pdfDocument.rawValue]
         case "png":
+            mediaType = .staticImage
             metadata.contentType = "image/png"
             metadata.customMetadata = ["dnsMediaType": DNSMediaType.staticImage.rawValue]
         case "txt":
+            mediaType = .text
             metadata.contentType = "text/plain"
             metadata.customMetadata = ["dnsMediaType": DNSMediaType.text.rawValue]
         default:
@@ -93,7 +109,8 @@ open class WKRFirebaseMedia: WKRBlankMedia, DecodingConfigurationProviding, Enco
                 return
             }
             let media = try! result.get() // swiftlint:disable:this force_try
-            media.type = .staticImage
+            media.path = path
+            media.type = mediaType
             block?(.success(media)); _ = resultBlock?(.completed)
         }
     }
@@ -122,6 +139,7 @@ open class WKRFirebaseMedia: WKRBlankMedia, DecodingConfigurationProviding, Enco
                 return
             }
             let media = try! result.get() // swiftlint:disable:this force_try
+            media.path = path
             media.type = .staticImage
             block?(.success(media)); _ = resultBlock?(.completed)
         }
@@ -151,6 +169,7 @@ open class WKRFirebaseMedia: WKRBlankMedia, DecodingConfigurationProviding, Enco
                 return
             }
             let media = try! result.get() // swiftlint:disable:this force_try
+            media.path = path
             media.type = .pdfDocument
             block?(.success(media)); _ = resultBlock?(.completed)
         }
@@ -176,12 +195,24 @@ open class WKRFirebaseMedia: WKRBlankMedia, DecodingConfigurationProviding, Enco
                 return
             }
             let media = try! result.get() // swiftlint:disable:this force_try
+            media.path = path
             media.type = .text
             block?(.success(media)); _ = resultBlock?(.completed)
         }
     }
     
     // MARK: - Utility methods -
+    func utilityRemoveMedia(from storageRef: StorageReference,
+                            with progressBlk: DNSPTCLProgressBlock?,
+                            and block: WKRPTCLMediaBlkVoid?) {
+        storageRef.delete { error in
+            if let error {
+                block?(.failure(error));
+                return
+            }
+            block?(.success)
+        }
+    }
     func utilityUploadMedia(data: Data,
                             with metadata: StorageMetadata? = nil,
                             to storageRef: StorageReference,
