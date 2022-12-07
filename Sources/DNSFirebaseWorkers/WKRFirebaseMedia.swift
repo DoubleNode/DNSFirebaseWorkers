@@ -206,11 +206,25 @@ open class WKRFirebaseMedia: WKRBlankMedia, DecodingConfigurationProviding, Enco
                             with progressBlk: DNSPTCLProgressBlock?,
                             and block: WKRPTCLMediaBlkVoid?) {
         storageRef.delete { error in
-            if let error {
-                block?(.failure(error));
-                return
+            if let error = error as? NSError {
+                switch (StorageErrorCode(rawValue: error.code)!) {
+                case .objectNotFound:
+                    let dnsError = DNSError.Media.notFound(field: "object", value: storageRef.fullPath, .firebaseWorkers(self))
+                    block?(.failure(dnsError));
+                case .bucketNotFound:
+                    let dnsError = DNSError.Media.notFound(field: "bucket", value: storageRef.bucket, .firebaseWorkers(self))
+                    block?(.failure(dnsError));
+                case .projectNotFound:
+                    let dnsError = DNSError.Media.notFound(field: "project", value: "[project]", .firebaseWorkers(self))
+                    block?(.failure(dnsError));
+                case .invalidArgument:
+                    let dnsError = DNSError.Media.invalidParameters(parameters: [], .firebaseWorkers(self))
+                    block?(.failure(dnsError));
+                default:
+                    let dnsError = DNSError.Media.lowerError(error: error, .firebaseWorkers(self))
+                    block?(.failure(dnsError));
+                }
             }
-            block?(.success)
         }
     }
     func utilityUploadMedia(data: Data,
@@ -219,14 +233,44 @@ open class WKRFirebaseMedia: WKRBlankMedia, DecodingConfigurationProviding, Enco
                             with progressBlk: DNSPTCLProgressBlock?,
                             and block: WKRPTCLMediaBlkMedia?) {
         let uploadTask = storageRef.putData(data, metadata: metadata) { metadata, error in
-            if let error {
-                block?(.failure(error));
-                return
+            if let error = error as? NSError {
+                switch (StorageErrorCode(rawValue: error.code)!) {
+                case .objectNotFound:
+                    let dnsError = DNSError.Media.notFound(field: "object", value: storageRef.fullPath, .firebaseWorkers(self))
+                    block?(.failure(dnsError));
+                case .bucketNotFound:
+                    let dnsError = DNSError.Media.notFound(field: "bucket", value: storageRef.bucket, .firebaseWorkers(self))
+                    block?(.failure(dnsError));
+                case .projectNotFound:
+                    let dnsError = DNSError.Media.notFound(field: "project", value: "[project]", .firebaseWorkers(self))
+                    block?(.failure(dnsError));
+                case .invalidArgument:
+                    let dnsError = DNSError.Media.invalidParameters(parameters: [], .firebaseWorkers(self))
+                    block?(.failure(dnsError));
+                default:
+                    let dnsError = DNSError.Media.lowerError(error: error, .firebaseWorkers(self))
+                    block?(.failure(dnsError));
+                }
             }
             storageRef.downloadURL { url, error in
-                if let error {
-                    block?(.failure(error));
-                    return
+                if let error = error as? NSError {
+                    switch (StorageErrorCode(rawValue: error.code)!) {
+                    case .objectNotFound:
+                        let dnsError = DNSError.Media.notFound(field: "object", value: storageRef.fullPath, .firebaseWorkers(self))
+                        block?(.failure(dnsError));
+                    case .bucketNotFound:
+                        let dnsError = DNSError.Media.notFound(field: "bucket", value: storageRef.bucket, .firebaseWorkers(self))
+                        block?(.failure(dnsError));
+                    case .projectNotFound:
+                        let dnsError = DNSError.Media.notFound(field: "project", value: "[project]", .firebaseWorkers(self))
+                        block?(.failure(dnsError));
+                    case .invalidArgument:
+                        let dnsError = DNSError.Media.invalidParameters(parameters: [], .firebaseWorkers(self))
+                        block?(.failure(dnsError));
+                    default:
+                        let dnsError = DNSError.Media.lowerError(error: error, .firebaseWorkers(self))
+                        block?(.failure(dnsError));
+                    }
                 }
                 guard let downloadUrl = url else {
                     let error = DNSError.NetworkBase.dataError(.firebaseWorkers(self))
@@ -254,14 +298,44 @@ open class WKRFirebaseMedia: WKRBlankMedia, DecodingConfigurationProviding, Enco
                             with progressBlk: DNSPTCLProgressBlock?,
                             and block: WKRPTCLMediaBlkMedia?) {
         let uploadTask = storageRef.putFile(from: fileUrl, metadata: metadata) { metadata, error in
-            if let error {
-                block?(.failure(error));
-                return
+            if let error = error as? NSError {
+                switch (StorageErrorCode(rawValue: error.code)!) {
+                case .objectNotFound:
+                    let dnsError = DNSError.Media.notFound(field: "object", value: storageRef.fullPath, .firebaseWorkers(self))
+                    block?(.failure(dnsError));
+                case .bucketNotFound:
+                    let dnsError = DNSError.Media.notFound(field: "bucket", value: storageRef.bucket, .firebaseWorkers(self))
+                    block?(.failure(dnsError));
+                case .projectNotFound:
+                    let dnsError = DNSError.Media.notFound(field: "project", value: "[project]", .firebaseWorkers(self))
+                    block?(.failure(dnsError));
+                case .invalidArgument:
+                    let dnsError = DNSError.Media.invalidParameters(parameters: [], .firebaseWorkers(self))
+                    block?(.failure(dnsError));
+                default:
+                    let dnsError = DNSError.Media.lowerError(error: error, .firebaseWorkers(self))
+                    block?(.failure(dnsError));
+                }
             }
             storageRef.downloadURL { url, error in
-                if let error {
-                    block?(.failure(error));
-                    return
+                if let error = error as? NSError {
+                    switch (StorageErrorCode(rawValue: error.code)!) {
+                    case .objectNotFound:
+                        let dnsError = DNSError.Media.notFound(field: "object", value: storageRef.fullPath, .firebaseWorkers(self))
+                        block?(.failure(dnsError));
+                    case .bucketNotFound:
+                        let dnsError = DNSError.Media.notFound(field: "bucket", value: storageRef.bucket, .firebaseWorkers(self))
+                        block?(.failure(dnsError));
+                    case .projectNotFound:
+                        let dnsError = DNSError.Media.notFound(field: "project", value: "[project]", .firebaseWorkers(self))
+                        block?(.failure(dnsError));
+                    case .invalidArgument:
+                        let dnsError = DNSError.Media.invalidParameters(parameters: [], .firebaseWorkers(self))
+                        block?(.failure(dnsError));
+                    default:
+                        let dnsError = DNSError.Media.lowerError(error: error, .firebaseWorkers(self))
+                        block?(.failure(dnsError));
+                    }
                 }
                 guard let downloadUrl = url else {
                     let error = DNSError.NetworkBase.dataError(.firebaseWorkers(self))
