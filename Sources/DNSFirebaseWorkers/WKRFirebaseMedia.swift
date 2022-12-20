@@ -119,17 +119,35 @@ open class WKRFirebaseMedia: WKRBlankMedia, DecodingConfigurationProviding, Enco
                                    with progress: DNSPTCLProgressBlock?,
                                    and block: WKRPTCLMediaBlkMedia?,
                                    then resultBlock: DNSPTCLResultBlock?) {
-        guard let imageData = image.jpegData(compressionQuality: 0.75) else {
+        let imageRef = self.storage.reference().child(path)
+        let metadata = StorageMetadata()
+        let pathUrl = URL(string: path)
+        var mediaType: DNSMediaType = .unknown
+        var imageData: Data?
+        switch pathUrl?.pathExtension {
+//        case "gif":
+//            imageData = pngData
+//            mediaType = .animatedImage
+//            metadata.contentType = "image/gif"
+//            metadata.customMetadata = ["dnsMediaType": DNSMediaType.animatedImage.rawValue]
+        case "png":
+            imageData = image.pngData()
+            mediaType = .staticImage
+            metadata.contentType = "image/png"
+            metadata.customMetadata = ["dnsMediaType": DNSMediaType.staticImage.rawValue]
+        case "jpg", "jpeg":
+            fallthrough
+        default:
+            imageData = image.jpegData(compressionQuality: 0.75)
+            mediaType = .staticImage
+            metadata.contentType = "image/jpeg"
+            metadata.customMetadata = ["dnsMediaType": DNSMediaType.staticImage.rawValue]
+        }
+        guard let imageData else {
             let error = DNSError.NetworkBase.dataError(.firebaseWorkers(self))
             block?(.failure(error)); _ = resultBlock?(.error)
             return
         }
-        
-        let imageRef = self.storage.reference().child(path)
-        let metadata = StorageMetadata()
-        metadata.contentType = "image/jpeg"
-        metadata.customMetadata = ["dnsMediaType": DNSMediaType.staticImage.rawValue]
-
         self.utilityUploadMedia(data: imageData, with: metadata,
                                 to: imageRef,
                                 with: progress) { result in
@@ -140,7 +158,7 @@ open class WKRFirebaseMedia: WKRBlankMedia, DecodingConfigurationProviding, Enco
             }
             let media = try! result.get() // swiftlint:disable:this force_try
             media.path = path
-            media.type = .staticImage
+            media.type = mediaType
             block?(.success(media)); _ = resultBlock?(.completed)
         }
     }
