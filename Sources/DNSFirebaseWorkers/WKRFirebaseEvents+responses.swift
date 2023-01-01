@@ -22,3 +22,10 @@ public struct RSPWKRFirebaseEventsAEvent: PTCLRSPWKRFirebaseEventsAEvent {
     // MARK: - Properties -
     public var events: [DAOEvent] = []
 }
+public protocol PTCLRSPWKRFirebaseEventsMeta: Codable {
+    var meta: DNSMetadata { get }
+}
+public struct RSPWKRFirebaseEventsMeta: PTCLRSPWKRFirebaseEventsMeta {
+    // MARK: - Properties -
+    public var meta: DNSMetadata = DNSMetadata()
+}

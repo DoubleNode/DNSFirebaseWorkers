@@ -17,9 +17,11 @@ import FirebaseFirestore
 
 public protocol PTCLCFGWKRFirebaseEvents: PTCLCFGDAOEvent {
     var eventsResponseType: any PTCLRSPWKRFirebaseEventsAEvent.Type { get }
+    var metaResponseType: any PTCLRSPWKRFirebaseEventsMeta.Type { get }
 }
 public class CFGWKRFirebaseEvents: PTCLCFGWKRFirebaseEvents {
     public var eventsResponseType: any PTCLRSPWKRFirebaseEventsAEvent.Type = RSPWKRFirebaseEventsAEvent.self
+    public var metaResponseType: any PTCLRSPWKRFirebaseEventsMeta.Type = RSPWKRFirebaseEventsMeta.self
 
     public var eventType: DAOEvent.Type = DAOEvent.self
     open func event<K>(from container: KeyedDecodingContainer<K>,
@@ -127,7 +129,7 @@ open class WKRFirebaseEvents: WKRBlankEvents, DecodingConfigurationProviding, En
                                   to event: DAOEvent,
                                   for place: DAOPlace,
                                   with progress: DNSPTCLProgressBlock?,
-                                  and block: WKRPTCLEventsBlkVoid?,
+                                  and block: WKRPTCLEventsBlkMeta?,
                                   then resultBlock: DNSPTCLResultBlock?) {
         let callData = WKRPTCLSystemsStateData(system: DNSAppConstants.Systems.events,
                                                endPoint: DNSAppConstants.Systems.Events.EndPoints.reactUnreact,
@@ -141,8 +143,14 @@ open class WKRFirebaseEvents: WKRBlankEvents, DecodingConfigurationProviding, En
         }
         self.processRequestData(callData, dataRequest, with: resultBlock,
                                 onSuccess: { data in
-            block?(.success)
-            return .success
+            do {
+                let response = try JSONDecoder().decode(Self.config.metaResponseType, from: data)
+                block?(.success(response.meta))
+                return .success
+            } catch {
+                DNSCore.reportError(error)
+                return .failure(error)
+            }
         },
                                 onPendingError: { error, _ in
             if case DNSError.NetworkBase.expiredAccessToken = error {
@@ -188,7 +196,7 @@ open class WKRFirebaseEvents: WKRBlankEvents, DecodingConfigurationProviding, En
                                     to event: DAOEvent,
                                     for place: DAOPlace,
                                     with progress: DNSPTCLProgressBlock?,
-                                    and block: WKRPTCLEventsBlkVoid?,
+                                    and block: WKRPTCLEventsBlkMeta?,
                                     then resultBlock: DNSPTCLResultBlock?) {
         let callData = WKRPTCLSystemsStateData(system: DNSAppConstants.Systems.events,
                                                endPoint: DNSAppConstants.Systems.Events.EndPoints.reactUnreact,
@@ -202,8 +210,14 @@ open class WKRFirebaseEvents: WKRBlankEvents, DecodingConfigurationProviding, En
         }
         self.processRequestData(callData, dataRequest, with: resultBlock,
                                 onSuccess: { data in
-            block?(.success)
-            return .success
+            do {
+                let response = try JSONDecoder().decode(Self.config.metaResponseType, from: data)
+                block?(.success(response.meta))
+                return .success
+            } catch {
+                DNSCore.reportError(error)
+                return .failure(error)
+            }
         },
                                 onPendingError: { error, _ in
             if case DNSError.NetworkBase.expiredAccessToken = error {
@@ -248,7 +262,7 @@ open class WKRFirebaseEvents: WKRBlankEvents, DecodingConfigurationProviding, En
     override open func intDoView(_ event: DAOEvent,
                                  for place: DAOPlace,
                                  with progress: DNSPTCLProgressBlock?,
-                                 and block: WKRPTCLEventsBlkVoid?,
+                                 and block: WKRPTCLEventsBlkMeta?,
                                  then resultBlock: DNSPTCLResultBlock?) {
         let callData = WKRPTCLSystemsStateData(system: DNSAppConstants.Systems.events,
                                                endPoint: DNSAppConstants.Systems.Events.EndPoints.view,
@@ -262,8 +276,14 @@ open class WKRFirebaseEvents: WKRBlankEvents, DecodingConfigurationProviding, En
         }
         self.processRequestData(callData, dataRequest, with: resultBlock,
                                 onSuccess: { data in
-            block?(.success)
-            return .success
+            do {
+                let response = try JSONDecoder().decode(Self.config.metaResponseType, from: data)
+                block?(.success(response.meta))
+                return .success
+            } catch {
+                DNSCore.reportError(error)
+                return .failure(error)
+            }
         },
                                 onPendingError: { error, _ in
             if case DNSError.NetworkBase.expiredAccessToken = error {

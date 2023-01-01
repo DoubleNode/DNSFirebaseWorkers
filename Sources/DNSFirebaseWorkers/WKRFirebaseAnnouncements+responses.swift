@@ -31,3 +31,10 @@ public struct RSPWKRFirebaseAnnouncementsAAnnouncementPlace: PTCLRSPWKRFirebaseA
     public var announcements: [DAOAnnouncement] = []
     public var places: [DAOPlace] = []
 }
+public protocol PTCLRSPWKRFirebaseAnnouncementsMeta: Codable {
+    var meta: DNSMetadata { get }
+}
+public struct RSPWKRFirebaseAnnouncementsMeta: PTCLRSPWKRFirebaseAnnouncementsMeta {
+    // MARK: - Properties -
+    public var meta: DNSMetadata = DNSMetadata()
+}
