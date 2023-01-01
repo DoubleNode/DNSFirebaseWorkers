@@ -123,6 +123,37 @@ open class WKRFirebaseEvents: WKRBlankEvents, DecodingConfigurationProviding, En
             block?(.failure(error))
         })
     }
+    override open func intDoReact(with reaction: DNSReactionType,
+                                  to event: DAOEvent,
+                                  for place: DAOPlace,
+                                  with progress: DNSPTCLProgressBlock?,
+                                  and block: WKRPTCLEventsBlkVoid?,
+                                  then resultBlock: DNSPTCLResultBlock?) {
+        let callData = WKRPTCLSystemsStateData(system: DNSAppConstants.Systems.events,
+                                               endPoint: DNSAppConstants.Systems.Events.EndPoints.reactUnreact,
+                                               sendDebug: DNSAppConstants.Systems.Events.sendDebug)
+
+        guard let dataRequest = try? API.apiReact(router: self.netRouter, reaction: reaction, event: event, place: place)
+            .dataRequest.get() else {
+            let error = DNSError.NetworkBase.dataError(.firebaseWorkers(self))
+            block?(.failure(error)); _ = resultBlock?(.error)
+            return
+        }
+        self.processRequestData(callData, dataRequest, with: resultBlock,
+                                onSuccess: { data in
+            block?(.success)
+            return .success
+        },
+                                onPendingError: { error, _ in
+            if case DNSError.NetworkBase.expiredAccessToken = error {
+                return error
+            }
+            return DNSError.NetworkBase.lowerError(error: error, .firebaseWorkers(self))
+        },
+                                onError: { error, _ in
+            block?(.failure(error))
+        })
+    }
     override open func intDoRemove(_ event: DAOEvent,
                                    for place: DAOPlace,
                                    with progress: DNSPTCLProgressBlock?,
@@ -153,6 +184,37 @@ open class WKRFirebaseEvents: WKRBlankEvents, DecodingConfigurationProviding, En
             block?(.failure(error))
         })
     }
+    override open func intDoUnreact(with reaction: DNSReactionType,
+                                    to event: DAOEvent,
+                                    for place: DAOPlace,
+                                    with progress: DNSPTCLProgressBlock?,
+                                    and block: WKRPTCLEventsBlkVoid?,
+                                    then resultBlock: DNSPTCLResultBlock?) {
+        let callData = WKRPTCLSystemsStateData(system: DNSAppConstants.Systems.events,
+                                               endPoint: DNSAppConstants.Systems.Events.EndPoints.reactUnreact,
+                                               sendDebug: DNSAppConstants.Systems.Events.sendDebug)
+
+        guard let dataRequest = try? API.apiUnreact(router: self.netRouter, reaction: reaction, event: event, place: place)
+            .dataRequest.get() else {
+            let error = DNSError.NetworkBase.dataError(.firebaseWorkers(self))
+            block?(.failure(error)); _ = resultBlock?(.error)
+            return
+        }
+        self.processRequestData(callData, dataRequest, with: resultBlock,
+                                onSuccess: { data in
+            block?(.success)
+            return .success
+        },
+                                onPendingError: { error, _ in
+            if case DNSError.NetworkBase.expiredAccessToken = error {
+                return error
+            }
+            return DNSError.NetworkBase.lowerError(error: error, .firebaseWorkers(self))
+        },
+                                onError: { error, _ in
+            block?(.failure(error))
+        })
+    }
     override open func intDoUpdate(_ event: DAOEvent,
                                    for place: DAOPlace,
                                    with progress: DNSPTCLProgressBlock?,
@@ -163,6 +225,36 @@ open class WKRFirebaseEvents: WKRBlankEvents, DecodingConfigurationProviding, En
                                                sendDebug: DNSAppConstants.Systems.Events.sendDebug)
 
         guard let dataRequest = try? API.apiUpdateEvent(router: self.netRouter, event: event, place: place)
+            .dataRequest.get() else {
+            let error = DNSError.NetworkBase.dataError(.firebaseWorkers(self))
+            block?(.failure(error)); _ = resultBlock?(.error)
+            return
+        }
+        self.processRequestData(callData, dataRequest, with: resultBlock,
+                                onSuccess: { data in
+            block?(.success)
+            return .success
+        },
+                                onPendingError: { error, _ in
+            if case DNSError.NetworkBase.expiredAccessToken = error {
+                return error
+            }
+            return DNSError.NetworkBase.lowerError(error: error, .firebaseWorkers(self))
+        },
+                                onError: { error, _ in
+            block?(.failure(error))
+        })
+    }
+    override open func intDoView(_ event: DAOEvent,
+                                 for place: DAOPlace,
+                                 with progress: DNSPTCLProgressBlock?,
+                                 and block: WKRPTCLEventsBlkVoid?,
+                                 then resultBlock: DNSPTCLResultBlock?) {
+        let callData = WKRPTCLSystemsStateData(system: DNSAppConstants.Systems.events,
+                                               endPoint: DNSAppConstants.Systems.Events.EndPoints.view,
+                                               sendDebug: DNSAppConstants.Systems.Events.sendDebug)
+
+        guard let dataRequest = try? API.apiView(router: self.netRouter, event: event, place: place)
             .dataRequest.get() else {
             let error = DNSError.NetworkBase.dataError(.firebaseWorkers(self))
             block?(.failure(error)); _ = resultBlock?(.error)
