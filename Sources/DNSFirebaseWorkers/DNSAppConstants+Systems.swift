@@ -197,7 +197,9 @@ public extension DNSAppConstants {
                 static public let loadEvents = "loadEvents"
                 static public let reactUnreact = "reactUnreact"
                 static public let removeEvent = "removeEvent"
+                static public let removeEventDay = "removeEventDay"
                 static public let updateEvent = "updateEvent"
+                static public let updateEventDay = "updateEventDay"
                 static public let view = "view"
             }
         }
