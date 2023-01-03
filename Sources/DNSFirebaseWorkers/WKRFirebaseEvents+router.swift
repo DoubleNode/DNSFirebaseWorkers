@@ -48,7 +48,7 @@ open class WKRFirebaseEventsRouter: NETBlankRouter {
         if case .failure(let error) = componentsResult { DNSCore.reportError(error); return .failure(error) }
 
         var components = try! componentsResult.get() // swiftlint:disable:this force_try
-        components.path += "/events/"
+        components.path += "/events/current"
         components.queryItems = parameters.map({ (key, value) -> URLQueryItem in
             URLQueryItem(name: key, value: String(value))
         })
