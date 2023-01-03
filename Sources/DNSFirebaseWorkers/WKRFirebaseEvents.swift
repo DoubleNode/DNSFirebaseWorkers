@@ -18,10 +18,12 @@ import FirebaseFirestore
 public protocol PTCLCFGWKRFirebaseEvents: PTCLCFGDAOEvent {
     var eventsResponseType: any PTCLRSPWKRFirebaseEventsAEvent.Type { get }
     var metaResponseType: any PTCLRSPWKRFirebaseEventsMeta.Type { get }
+    var placesResponseType: any PTCLRSPWKRFirebaseEventsAPlace.Type { get }
 }
 public class CFGWKRFirebaseEvents: PTCLCFGWKRFirebaseEvents {
     public var eventsResponseType: any PTCLRSPWKRFirebaseEventsAEvent.Type = RSPWKRFirebaseEventsAEvent.self
     public var metaResponseType: any PTCLRSPWKRFirebaseEventsMeta.Type = RSPWKRFirebaseEventsMeta.self
+    public var placesResponseType: any PTCLRSPWKRFirebaseEventsAPlace.Type = RSPWKRFirebaseEventsAPlace.self
 
     public var eventType: DAOEvent.Type = DAOEvent.self
     open func event<K>(from container: KeyedDecodingContainer<K>,
@@ -57,7 +59,7 @@ open class WKRFirebaseEvents: WKRBlankEvents, DecodingConfigurationProviding, En
 
     // MARK: - Internal Work Methods
     override open func intDoLoadCurrentEvents(with progress: DNSPTCLProgressBlock?,
-                                              and block: WKRPTCLEventsBlkAEvent?,
+                                              and block: WKRPTCLEventsBlkAPlace?,
                                               then resultBlock: DNSPTCLResultBlock?) {
         let callData = WKRPTCLSystemsStateData(system: DNSAppConstants.Systems.events,
                                                endPoint: DNSAppConstants.Systems.Events.EndPoints.loadEvents,
@@ -72,8 +74,8 @@ open class WKRFirebaseEvents: WKRBlankEvents, DecodingConfigurationProviding, En
         self.processRequestData(callData, dataRequest, with: resultBlock,
                                 onSuccess: { data in
             do {
-                let response = try JSONDecoder().decode(Self.config.eventsResponseType, from: data)
-                block?(.success(response.events))
+                let response = try JSONDecoder().decode(Self.config.placesResponseType, from: data)
+                block?(.success(response.places))
                 return .success
             } catch {
                 DNSCore.reportError(error)
