@@ -59,8 +59,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/DoubleNode/DNSBlankWorkers.git",
       "state" : {
-        "revision" : "ad015f7bfbaed7db0ddc30f28d0ced6852524a52",
-        "version" : "1.10.35"
+        "revision" : "c11e01c5edb3b5941e4c4bd256f7cbec91a01c5a",
+        "version" : "1.10.37"
       }
     },
     {
@@ -68,8 +68,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/DoubleNode/DNSCore.git",
       "state" : {
-        "revision" : "ceede6439713d8510c5d023e22f2181b37ba124a",
-        "version" : "1.10.18"
+        "revision" : "be9b753b7249ff7179af85edaad4c25751210245",
+        "version" : "1.10.28"
       }
     },
     {
@@ -95,8 +95,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/DoubleNode/DNSCrashWorkers.git",
       "state" : {
-        "revision" : "84e7d492f97b013e5857f68d52e59fc988bff9a8",
-        "version" : "1.10.28"
+        "revision" : "0a78cf65c8b8b342055737c228781796802833d2",
+        "version" : "1.10.30"
       }
     },
     {
@@ -104,8 +104,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/DoubleNode/DNSDataObjects.git",
       "state" : {
-        "revision" : "ae50d28f28d84af454585808e1790872ee44abb5",
-        "version" : "1.10.55"
+        "revision" : "4a393aeb6cb998fd653aa338c89757f0ad969894",
+        "version" : "1.10.59"
       }
     },
     {
@@ -122,8 +122,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/DoubleNode/DNSProtocols.git",
       "state" : {
-        "revision" : "67fd0324302d1e8337c11c3e347f023082bf0ea3",
-        "version" : "1.10.49"
+        "revision" : "17a6a7d56467b98fc48d15215a15adc449bf5a8a",
+        "version" : "1.10.53"
       }
     },
     {
@@ -230,8 +230,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Nirma/SFSymbol",
       "state" : {
-        "revision" : "90ec3de89965be4612b496211e1f31a363a1df42",
-        "version" : "1.1.0"
+        "revision" : "d6680f79d5b293ddfc4640ad6d4101697426e840",
+        "version" : "2.0.0"
       }
     },
     {
