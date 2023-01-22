@@ -201,7 +201,7 @@ open class WKRFirebaseEventsRouter: NETBlankRouter {
         if case .failure(let error) = componentsResult { DNSCore.reportError(error); return .failure(error) }
 
         var components = try! componentsResult.get() // swiftlint:disable:this force_try
-        components.path += "/places/\(place.id)/events/\(event.id)/eventDay/\(eventDay.id)"
+        components.path += "/places/\(place.id)/events/\(event.id)/eventDays/\(eventDay.id)"
         guard let url = components.url else {
             let error = DNSError.NetworkBase.invalidUrl(.firebaseWorkers(self))
             DNSCore.reportError(error)
@@ -214,7 +214,7 @@ open class WKRFirebaseEventsRouter: NETBlankRouter {
         var request = try! requestResult.get() // swiftlint:disable:this force_try
         request.method = .post
         do {
-            request = try JSONParameterEncoder().encode(event, into: request)
+            request = try JSONParameterEncoder().encode(eventDay, into: request)
         } catch {
             DNSCore.reportError(error)
             return .failure(error)
