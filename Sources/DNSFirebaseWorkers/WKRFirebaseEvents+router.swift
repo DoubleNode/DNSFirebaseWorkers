@@ -201,7 +201,7 @@ open class WKRFirebaseEventsRouter: NETBlankRouter {
         if case .failure(let error) = componentsResult { DNSCore.reportError(error); return .failure(error) }
 
         var components = try! componentsResult.get() // swiftlint:disable:this force_try
-        components.path += "/places/\(place.id)/events/\(event.id)/eventDay/\(eventDay.id)"
+        components.path += "/places/\(place.id)/events/\(event.id)/eventDays/\(eventDay.id)"
         guard let url = components.url else {
             let error = DNSError.NetworkBase.invalidUrl(.firebaseWorkers(self))
             DNSCore.reportError(error)
