@@ -106,6 +106,8 @@ open class WKRFirebaseAuthAccessData: WKRPTCLAuthAccessData, Codable, NSCopying 
 open class WKRFirebaseAuth: WKRBlankAuth, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
     public typealias AccessData = WKRFirebaseAuthAccessData
 
+    public static var auth: Auth = Auth.auth()
+
     public enum Method: String, CaseIterable {
         case apple = "apple.com"
         case `default`
@@ -174,9 +176,9 @@ open class WKRFirebaseAuth: WKRBlankAuth, ASAuthorizationControllerDelegate, ASA
 
         var parameters = parameters
         parameters["method"] = WKRFirebaseAuth.Method.apple
-        intDoSignIn(from: username, and: password, using: parameters,
-                    with: nil,
-                    and: { [weak self] result in
+        self.intDoSignIn(from: username, and: password, using: parameters,
+                         with: nil,
+                         and: { [weak self] result in
             guard let self else { return }
             if case .failure(let error) = result {
                 self.utilityReportSystemFailure(sendDebug: systemStateSendDebug,
@@ -199,7 +201,7 @@ open class WKRFirebaseAuth: WKRBlankAuth, ASAuthorizationControllerDelegate, ASA
                     _ = resultBlock?(.failure(error))
                     return
                 }
-                guard let currentUser = Auth.auth().currentUser else {
+                guard let currentUser = Self.auth.currentUser else {
                     let error = DNSError.Auth.notFound(field: "user", value: "currentUser", .firebaseWorkers(self))
                     DNSCore.reportError(error)
                     self.utilityReportSystemFailure(sendDebug: systemStateSendDebug,
@@ -353,7 +355,7 @@ open class WKRFirebaseAuth: WKRBlankAuth, ASAuthorizationControllerDelegate, ASA
         let systemStateSendDebug = DNSAppConstants.Systems.Auth.sendDebug
 
         do {
-            try Auth.auth().signOut()
+            try Self.auth.signOut()
         } catch let error as NSError {
             self.utilityReportSystemFailure(sendDebug: systemStateSendDebug,
                                             debugString: "Error signing out: \(error.localizedDescription)",
@@ -410,8 +412,8 @@ open class WKRFirebaseAuth: WKRBlankAuth, ASAuthorizationControllerDelegate, ASA
             _ = resultBlock?(.failure(error))
             return
         }
-        Auth.auth().createUser(withEmail: user.email,
-                               password: password) { [weak self] authResult, error in
+        Self.auth.createUser(withEmail: user.email,
+                             password: password) { [weak self] authResult, error in
             guard let self else { return }
             if let error {
                 let error = self.utilityTranslateAuthError(AuthErrorCode.Code(rawValue: error._code),
@@ -509,7 +511,7 @@ open class WKRFirebaseAuth: WKRBlankAuth, ASAuthorizationControllerDelegate, ASA
                 let credential = OAuthProvider.credential(withProviderID: "apple.com",
                                                           idToken: idTokenString,
                                                           rawNonce: nonce)
-                Auth.auth().signIn(with: credential) { [weak self] authResult, error in
+                Self.auth.signIn(with: credential) { [weak self] authResult, error in
                     guard let self else { return }
                     if let error {
                         self.utilityReportSystemFailure(sendDebug: systemStateSendDebug,
@@ -550,7 +552,7 @@ open class WKRFirebaseAuth: WKRBlankAuth, ASAuthorizationControllerDelegate, ASA
                 }
                 return
             }
-            Auth.auth().fetchSignInMethods(forEmail: userEmail) { [weak self] methods, error in
+            Self.auth.fetchSignInMethods(forEmail: userEmail) { [weak self] methods, error in
                 guard let self else { return }
                 if let error {
                     let error = self.utilityTranslateAuthError(AuthErrorCode.Code(rawValue: error._code),
@@ -574,7 +576,7 @@ open class WKRFirebaseAuth: WKRBlankAuth, ASAuthorizationControllerDelegate, ASA
                             _ = self.appleFlowResultBlock?(.failure(error))
                             return
                         }
-                        guard let currentUser = Auth.auth().currentUser else {
+                        guard let currentUser = Self.auth.currentUser else {
                             let error = DNSError.Auth.notFound(field: "user", value: "currentUser", .firebaseWorkers(self))
                             self.appleFlowBlock?(.failure(error))
                             _ = self.appleFlowResultBlock?(.failure(error))
@@ -632,7 +634,7 @@ open class WKRFirebaseAuth: WKRBlankAuth, ASAuthorizationControllerDelegate, ASA
                                                           idToken: idTokenString,
                                                           rawNonce: nonce)
                 // Sign in with Firebase.
-                Auth.auth().signIn(with: credential) { [weak self] authResult, error in
+                Self.auth.signIn(with: credential) { [weak self] authResult, error in
                     guard let self else { return }
                     if let error {
                         let error = self.utilityTranslateAuthError(AuthErrorCode.Code(rawValue: error._code),
@@ -800,7 +802,7 @@ open class WKRFirebaseAuth: WKRBlankAuth, ASAuthorizationControllerDelegate, ASA
         authorizationController.performRequests()
     }
     func utilityGetIDToken(with block: WKRFirebaseAuthBlkUserString?) {
-        guard let currentUser = Auth.auth().currentUser else {
+        guard let currentUser = Self.auth.currentUser else {
             let error = DNSError.Auth.notFound(field: "user", value: "currentUser", .firebaseWorkers(self))
             block?(.failure(error))
             return
@@ -826,7 +828,7 @@ open class WKRFirebaseAuth: WKRBlankAuth, ASAuthorizationControllerDelegate, ASA
         let systemStateEndPoint = DNSAppConstants.Systems.Auth.EndPoints.signIn
         let systemStateSendDebug = DNSAppConstants.Systems.Auth.sendDebug
 
-        Auth.auth().signIn(withEmail: username, password: password) { [weak self] authResult, error in
+        Self.auth.signIn(withEmail: username, password: password) { [weak self] authResult, error in
             guard let self else { return }
             if let error {
                 let error = self.utilityTranslateAuthError(AuthErrorCode.Code(rawValue: error._code),

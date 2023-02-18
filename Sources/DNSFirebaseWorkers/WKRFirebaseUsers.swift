@@ -313,7 +313,7 @@ open class WKRFirebaseUsers: WKRBlankUsers {
         let systemStateEndPoint = DNSAppConstants.Systems.Users.EndPoints.loadUser
 //        let systemStateSendDebug = DNSAppConstants.Systems.Users.sendDebug
 
-        guard let currentUser = Auth.auth().currentUser else {
+        guard let currentUser = WKRFirebaseAuth.auth.currentUser else {
             self.utilityReportSystemSuccess(for: systemStateSystem, and: systemStateEndPoint)
             let error = DNSError.Users.notFound(field: "User", value: "Current", .firebaseWorkers(self))
             block?(.failure(error))
