@@ -68,8 +68,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/DoubleNode/DNSCore.git",
       "state" : {
-        "revision" : "e1560c40b6b6e736d656b88de987a7c24fef883d",
-        "version" : "1.10.37"
+        "revision" : "3f61ea0a6891736577d0128dfb57fcdc20d3f039",
+        "version" : "1.10.38"
       }
     },
     {
