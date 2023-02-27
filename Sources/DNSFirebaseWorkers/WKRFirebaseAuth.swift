@@ -256,7 +256,33 @@ open class WKRFirebaseAuth: WKRBlankAuth, ASAuthorizationControllerDelegate, ASA
                                                then resultBlock: DNSPTCLResultBlock?) {
         let systemStateSystem = DNSAppConstants.Systems.auth
         let systemStateEndPoint = DNSAppConstants.Systems.Auth.EndPoints.signIn
-//        let systemStateSendDebug = DNSAppConstants.Systems.Auth.sendDebug
+        let systemStateSendDebug = DNSAppConstants.Systems.Auth.sendDebug
+
+        guard let username,
+              !username.isEmpty else {
+            let error = DNSError.Auth.invalidParameters(parameters: ["username"], .firebaseWorkers(self))
+            self.utilityReportSystemFailure(sendDebug: systemStateSendDebug,
+                                            debugString: error.localizedDescription,
+                                            and: "\(error.nsError.code)",
+                                            for: systemStateSystem, and: systemStateEndPoint)
+            block?(.failure(error))
+            _ = resultBlock?(.failure(error))
+            return
+        }
+
+        Self.auth.sendPasswordReset(withEmail: username) { error in
+            guard error == nil else {
+                let error = error! as NSError
+                self.utilityReportSystemFailure(sendDebug: systemStateSendDebug,
+                                                debugString: "Error Resetting Password: \(error.localizedDescription)",
+                                                and: "\(error.code)",
+                                                for: systemStateSystem, and: systemStateEndPoint)
+                let dnsError = DNSError.Auth.lowerError(error: error, .firebaseWorkers(self))
+                block?(.failure(dnsError))
+                _ = resultBlock?(.failure(dnsError))
+                return
+            }
+        }
 
         self.utilityReportSystemSuccess(for: systemStateSystem, and: systemStateEndPoint)
         block?(.success)
