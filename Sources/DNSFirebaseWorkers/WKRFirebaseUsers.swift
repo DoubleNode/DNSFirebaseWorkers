@@ -320,20 +320,18 @@ open class WKRFirebaseUsers: WKRBlankUsers {
             _ = resultBlock?(.notFound)
             return
         }
-        WKRFirebaseAuth.auth.updateCurrentUser(currentUser) { error in
-            self.doLoadUser(for: currentUser.uid) { result in
-                if case .failure(let error) = result {
-                    self.utilityReportSystemSuccess(for: systemStateSystem, and: systemStateEndPoint)
-                    block?(.failure(error))
-                    _ = resultBlock?(.notFound)
-                    return
-                }
-                let user = try! result.get()    // swiftlint:disable:this force_try
-                
+        self.doLoadUser(for: currentUser.uid) { result in
+            if case .failure(let error) = result {
                 self.utilityReportSystemSuccess(for: systemStateSystem, and: systemStateEndPoint)
-                block?(.success(user))
-                _ = resultBlock?(.completed)
+                block?(.failure(error))
+                _ = resultBlock?(.notFound)
+                return
             }
+            let user = try! result.get()    // swiftlint:disable:this force_try
+            
+            self.utilityReportSystemSuccess(for: systemStateSystem, and: systemStateEndPoint)
+            block?(.success(user))
+            _ = resultBlock?(.completed)
         }
     }
     override open func intDoLoadUser(for id: String,
