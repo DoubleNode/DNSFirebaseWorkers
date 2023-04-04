@@ -49,6 +49,7 @@ open class WKRFirebaseCMS: WKRBlankCms {
         public static let key = "key"
         public static let sortOrder = "sortOrder"
         public static let subTitle = "subTitle"
+        public static let subtitle = "subtitle"
         public static let title = "title"
         public static let logoUrl = "logoUrl"
     }
@@ -239,8 +240,11 @@ open class WKRFirebaseCMS: WKRBlankCms {
                     let footer = Self.xlt.string(from: Self.xlt.localized(value[DocumentStrings.footer])) ?? ""
                     document[DocumentStrings.footer] = self.utilityCleanupString(footer)
 
-                    let subTitle = Self.xlt.string(from: Self.xlt.localized(value[DocumentStrings.subTitle])) ?? ""
-                    document[DocumentStrings.subTitle] = self.utilityCleanupString(subTitle)
+                    var subtitle = Self.xlt.string(from: Self.xlt.localized(value[DocumentStrings.subtitle])) ?? ""
+                    if subtitle.isEmpty {
+                        subtitle = Self.xlt.string(from: Self.xlt.localized(value[DocumentStrings.subTitle])) ?? ""
+                    }
+                    document[DocumentStrings.subtitle] = self.utilityCleanupString(subtitle)
 
                     let title = Self.xlt.string(from: Self.xlt.localized(value[DocumentStrings.title])) ?? ""
                     document[DocumentStrings.title] = self.utilityCleanupString(title)
