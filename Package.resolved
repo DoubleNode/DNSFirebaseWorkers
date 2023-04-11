@@ -59,8 +59,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/DoubleNode/DNSBlankWorkers.git",
       "state" : {
-        "revision" : "10cf11d3d5d2635a9906f2dd8ff071662ec1ffdc",
-        "version" : "1.10.50"
+        "revision" : "de6ce479a02ded3561ef65525fbd5ec306e537ee",
+        "version" : "1.10.53"
       }
     },
     {
@@ -95,8 +95,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/DoubleNode/DNSCrashWorkers.git",
       "state" : {
-        "revision" : "55bde88f07f815e3e118e74cc28611b3253b9fe5",
-        "version" : "1.10.40"
+        "revision" : "a91a3094e48281f89643281f68999208e76fdc81",
+        "version" : "1.10.44"
       }
     },
     {
@@ -104,8 +104,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/DoubleNode/DNSDataObjects.git",
       "state" : {
-        "revision" : "52d3973c9c14cd47fed09b02ad836ab0ffe625a4",
-        "version" : "1.10.71"
+        "revision" : "d662ffc1c8ee31d5ea31a49a9aa141fde5e28f44",
+        "version" : "1.10.74"
       }
     },
     {
@@ -122,8 +122,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/DoubleNode/DNSProtocols.git",
       "state" : {
-        "revision" : "e6032d702e396db1d7a11b0aa15ccd60286382b3",
-        "version" : "1.10.77"
+        "revision" : "a58e5369c608b604bef9e8f9bfcebe3db6b223f1",
+        "version" : "1.10.80"
       }
     },
     {
@@ -131,8 +131,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/firebase/firebase-ios-sdk",
       "state" : {
-        "revision" : "dce2e1abc6c0d5e830ff1cffe3f8633fda64001e",
-        "version" : "10.3.0"
+        "revision" : "76de51f0e2be35ecb6ce05ed1ad0a73669b05a11",
+        "version" : "10.7.0"
       }
     },
     {
@@ -149,8 +149,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/google/GoogleAppMeasurement.git",
       "state" : {
-        "revision" : "71eb6700dd53a851473c48d392f00a3ab26699a6",
-        "version" : "10.1.0"
+        "revision" : "04351180d4c757c6c16127cb57b685fff9ef260b",
+        "version" : "10.6.0"
       }
     },
     {

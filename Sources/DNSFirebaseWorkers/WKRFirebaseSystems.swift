@@ -348,16 +348,16 @@ open class WKRFirebaseSystems: WKRBlankSystems, DecodingConfigurationProviding, 
         systemEndPoint.currentState = utilityLoadSystemState(for: document) ?? systemEndPoint.currentState
         return systemEndPoint
     }
-    func utilityLoadFailureCode(for document: DocumentSnapshot) -> DNSSystemStateNumbers? {
+    func utilityLoadFailureCode(for document: DocumentSnapshot) -> DNSAnalyticsNumbers? {
         guard let failureCodeData = document.data() else {
             return nil
         }
         let failure = Self.xlt.double(from: failureCodeData["failure"]) ?? 0.0
         let failureAndroid = Self.xlt.double(from: failureCodeData["failure_android"]) ?? 0.0
         let failureIOS = Self.xlt.double(from: failureCodeData["failure_ios"]) ?? 0.0
-        let numbers = DNSSystemStateNumbers(android: failureAndroid,
-                                            iOS: failureIOS,
-                                            total: failure)
+        let numbers = DNSAnalyticsNumbers(android: failureAndroid,
+                                          iOS: failureIOS,
+                                          total: failure)
         return numbers
     }
     func utilityLoadSystemState(for document: DocumentSnapshot) -> DAOSystemState? {
@@ -538,7 +538,7 @@ open class WKRFirebaseSystems: WKRBlankSystems, DecodingConfigurationProviding, 
     }
 
     // Protocol Return Types
-    public typealias WKRPTCLSystemsRtnASystemStateNumbers = [String: DNSSystemStateNumbers]
+    public typealias WKRPTCLSystemsRtnASystemStateNumbers = [String: DNSAnalyticsNumbers]
 
     // Protocol Result Types
     public typealias WKRPTCLSystemsResASystemStateNumbers = Result<WKRPTCLSystemsRtnASystemStateNumbers, Error>
@@ -568,7 +568,7 @@ open class WKRFirebaseSystems: WKRBlankSystems, DecodingConfigurationProviding, 
                     return
                 }
 
-                var failureCodes: [String: DNSSystemStateNumbers] = [:]
+                var failureCodes: [String: DNSAnalyticsNumbers] = [:]
                 failureCodesDocuments.forEach { (document) in
                     guard let numbers = self.utilityLoadFailureCode(for: document) else {
                         return
