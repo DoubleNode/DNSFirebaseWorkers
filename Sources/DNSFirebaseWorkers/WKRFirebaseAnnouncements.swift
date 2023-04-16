@@ -105,6 +105,9 @@ open class WKRFirebaseAnnouncements: WKRBlankAnnouncements, DecodingConfiguratio
             if case DNSError.NetworkBase.expiredAccessToken = error {
                 return error
             }
+            if case DNSError.NetworkBase.forbidden = error {
+                return error
+            }
             return DNSError.NetworkBase.lowerError(error: error, .firebaseWorkers(self))
         },
                                 onError: { error, _ in
